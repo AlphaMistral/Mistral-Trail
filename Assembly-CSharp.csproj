@@ -46,7 +46,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-     <Compile Include="Assets\Mistral Trail\Test Area\Scripts\Core\Base.cs" />
+     <Compile Include="Assets\Mistral Trail\Test Area\Scripts\Core\TrailBase.cs" />
+     <Compile Include="Assets\Mistral Trail\Test Area\Scripts\Utility\DataStructure\RingBuffer.cs" />
  <Reference Include="UnityEngine.UI">
  <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
  </Reference>
