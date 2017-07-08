@@ -48,6 +48,7 @@
   <ItemGroup>
      <Compile Include="Assets\Mistral Trail\Test Area\Scripts\Core\TrailBase.cs" />
      <Compile Include="Assets\Mistral Trail\Test Area\Scripts\HL\SimpleTrail.cs" />
+     <Compile Include="Assets\Mistral Trail\Test Area\Scripts\ShowCase\Rotate.cs" />
      <Compile Include="Assets\Mistral Trail\Test Area\Scripts\Utility\DataStructure\RingBuffer.cs" />
      <None Include="Assets\Mistral Trail\Test Area\Shaders\EffectDefult.shader" />
  <Reference Include="UnityEngine.UI">

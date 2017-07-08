@@ -16,6 +16,7 @@ using Mistral.Utility.DataStructure;
 namespace Mistral.Effects.Trail
 {
 	#region SubClasses
+
 	/// <summary>
 	/// This Serializable Class Serves as a Parameter Storage for Trail Rendering. 
 	/// </summary>
@@ -29,6 +30,7 @@ namespace Mistral.Effects.Trail
 		public bool isForwardOverrided;
 		public Vector3 forwardOverride;
 		public float quadScaleFactor;
+		public Transform forwardLookAt;
     }
 
 	/// <summary>
@@ -115,10 +117,11 @@ namespace Mistral.Effects.Trail
 		public TrailGraphics(int number)
 		{
 			mesh = new Mesh();
+
 			///This sentence is very important!
 			///We need to change the vertex array and triangle indices very frequently.
 			///Hence for performance issues we need to make the Engine know about the situation.
-			///Post-Comment -> At Least 25% performance up. 
+			///Post-Comment -> At Least 25% CPU performance increase. 
 			mesh.MarkDynamic();
 
 			///A TrailPoint is abstract.
@@ -183,6 +186,7 @@ namespace Mistral.Effects.Trail
 		/// <summary>
 		/// A Reference to the Transform Component.
 		/// All those guys say it is more efficient.
+		/// I dunno about it. 
 		/// </summary>
 		protected Transform m_transform;
 
@@ -435,7 +439,7 @@ namespace Mistral.Effects.Trail
 
 #endregion
 
-#region Private Methods
+		#region Private Methods
 
 		/// <summary>
 		/// Help a trail generate its own Mesh. 
@@ -542,11 +546,11 @@ namespace Mistral.Effects.Trail
 		/// </summary>
 		/// <param name="line"></param>
 		/// <param name="deltaTime"></param>
-		private void UpdatePoints(TrailGraphics line, float deltaTime)
+		private void UpdatePoints(TrailGraphics trail, float deltaTime)
 		{
-			for (int i = 0; i < line.points.Count; i++)
+			for (int i = 0; i < trail.points.Count; i++)
 			{
-				line.points[i].Update(deltaTime);
+				trail.points[i].Update(deltaTime);
 			}
 		}
 
@@ -591,11 +595,10 @@ namespace Mistral.Effects.Trail
 				}
 			}
 		}
-		
 
-#endregion
+		#endregion
 
 	}
 
-#endregion
+	#endregion
 }
