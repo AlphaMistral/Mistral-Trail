@@ -51,7 +51,14 @@ namespace Mistral.Effects.Trail
 
 		public int index;
 
+		/// <summary>
+		/// Time elapsed ever since the TrailPoint is instantiated. 
+		/// </summary>
 		public float timeSoFar = 0;
+
+		/// <summary>
+		/// The distance from the point to the source point. 
+		/// </summary>
 		public float distance2Src = 0;
 
 		/// <summary>
@@ -65,19 +72,40 @@ namespace Mistral.Effects.Trail
 		}
 	}
 
+	/// <summary>
+	/// This class specifies all the graphical components of a trail. 
+	/// To be honest it doesn't necessarily need to implement IDisposable Interface. 
+	/// So why did I do it anyway? -> Zhuangbility. 
+	/// </summary>
 	public class TrailGraphics : IDisposable
 	{
 		#region Public Variables
 
+		/// <summary>
+		/// The Object Pool Based memory management of all the TrailPoints. 
+		/// </summary>
 		public RingBuffer<TrailPoint> points;
+
+		/// <summary>
+		/// This is the Mesh to be rendered. 
+		/// Null in the beginning of course. 
+		/// </summary>
 		public Mesh mesh;
 
 		public Vector3[] vertices, normals;
 		public Vector2[] uvs;
 		public Color[] colors;
 		public int[] indices;
+
+		/// <summary>
+		/// How many vertices are actually active. 
+		/// </summary>
 		public int activeCount;
 
+		/// <summary>
+		/// Is this trail active. 
+		/// If it inherits from MonoBehaviour, it is actually the "enabled" attribute. 
+		/// </summary>
 		public bool activeSelf = false;
 
 		#endregion
@@ -90,6 +118,7 @@ namespace Mistral.Effects.Trail
 			///This sentence is very important!
 			///We need to change the vertex array and triangle indices very frequently.
 			///Hence for performance issues we need to make the Engine know about the situation.
+			///Post-Comment -> At Least 25% performance up. 
 			mesh.MarkDynamic();
 
 			///A TrailPoint is abstract.
@@ -121,6 +150,7 @@ namespace Mistral.Effects.Trail
 	#endregion
 
 	#region Main TrailBase Class
+
 	/// <summary>
 	/// Abstract Class for all kinds of trails. 
 	/// It also simultaneously serves as the Trail Rendering Manager! 
@@ -130,13 +160,24 @@ namespace Mistral.Effects.Trail
     {
 		#region Public Variables
 
+		/// <summary>
+		/// All the parameters the system require to render the trail. 
+		/// </summary>
         public TrailParameter parameter;
+
+		/// <summary>
+		/// Whether the trail should be emitting or not. 
+		/// </summary>
         public bool Emit = false;
 
 		#endregion
 
 		#region Protected Variables
 
+		/// <summary>
+		/// Current condition of the emission. 
+		/// Please note that it is different from the Emit by indicating the situation rather than definition. 
+		/// </summary>
 		protected bool isEmitting;
 		
 		/// <summary>
@@ -149,7 +190,14 @@ namespace Mistral.Effects.Trail
 
 		#region Private Variables
 
+		/// <summary>
+		/// These are the trails to be rendered. 
+		/// </summary>
 		private TrailGraphics activeTrail;
+
+		/// <summary>
+		/// These trails are being faded out and destroyed. 
+		/// </summary>
 		private List<TrailGraphics> fadingTrails;
 
 		#endregion
@@ -166,6 +214,9 @@ namespace Mistral.Effects.Trail
 
 		#region MonoBehaviours
 
+		/// <summary>
+		/// Serves as a variable-initializer. 
+		/// </summary>
 		protected virtual void Awake()
 		{
 			totalTrailsCount++;
@@ -176,6 +227,7 @@ namespace Mistral.Effects.Trail
 				generatedMeshes = new List<Mesh>();
 			}
 
+			fadingTrails = new List<TrailGraphics>();
 			m_transform = transform;
 			isEmitting = Emit;
 
@@ -187,6 +239,14 @@ namespace Mistral.Effects.Trail
 			}
 		}
 
+		protected virtual void Start()
+		{
+
+		}
+
+		/// <summary>
+		/// Draw the Meshes in LateUpdate. 
+		/// </summary>
 		protected virtual void LateUpdate()
 		{
 			if (isDrawing)
@@ -214,8 +274,13 @@ namespace Mistral.Effects.Trail
 			}
 		}
 
+		/// <summary>
+		/// Generate the Meshes in Update. 
+		/// </summary>
 		protected virtual void Update()
 		{
+			///If we are generating Meshes, we don't want to draw anything. 
+			///So simply destroy any mesh before generating anything. 
 			if(isDrawing)
 			{
 				isDrawing = false;
@@ -224,9 +289,9 @@ namespace Mistral.Effects.Trail
 					foreach (Mesh m in generatedMeshes)
 					{
 #if UNITY_EDITOR
-						UnityEngine.Object.DestroyImmediate(m, true);
+						DestroyImmediate(m, true);
 #else
-						UnityEngine.Object.Destroy(m);
+						Destroy(m);
 #endif
 					}
 				}
@@ -244,9 +309,11 @@ namespace Mistral.Effects.Trail
 			{
 				UpdatePoints(activeTrail, deltaTime);
 				UpdateTrail(activeTrail, deltaTime);
+				GenerateMesh(activeTrail);
 				mat2Trail[parameter.trailMaterial].Add(activeTrail);
 			}
 
+			///IMPROVEMENT: This section is extremely expensive! 
 			for (int i = fadingTrails.Count - 1; i >= 0; i--)
 			{
 				if (fadingTrails[i] == null || fadingTrails[i].points.Any(a => a.timeSoFar < parameter.lifeTime) == false)
@@ -263,7 +330,7 @@ namespace Mistral.Effects.Trail
 				mat2Trail[parameter.trailMaterial].Add(fadingTrails[i]);
 			}
 
-			CheckEmiChange();
+			CheckEmitChange();
 		}
 
 		#endregion
@@ -272,6 +339,9 @@ namespace Mistral.Effects.Trail
 
 		protected abstract int GetMaxPoints();
 
+		/// <summary>
+		/// De-constructor. 
+		/// </summary>
 		protected virtual void OnDestroy()
 		{
 			totalTrailsCount--;
@@ -333,15 +403,23 @@ namespace Mistral.Effects.Trail
 		protected virtual void InitializeNewPoint(TrailPoint point)
 		{
 
-
 		}
 
 		protected virtual void UpdateTrail(TrailGraphics trail, float deltaTime)
 		{
-
 			
 		}
 
+		protected virtual void UpdatePoint(TrailPoint point, float deltaTime)
+		{
+
+		}
+
+		/// <summary>
+		/// Add a new TrailPoint into the activeTrail. 
+		/// </summary>
+		/// <param name="point"></param>
+		/// <param name="position"></param>
 		protected void AddPoint(TrailPoint point, Vector3 position)
 		{
 			if (activeTrail == null)
@@ -350,7 +428,6 @@ namespace Mistral.Effects.Trail
 			point.index = activeTrail.points.Count == 0 ? 0 : activeTrail.points[activeTrail.points.Count - 1].index + 1;
 			InitializeNewPoint(point);
 			point.distance2Src = activeTrail.points.Count == 0 ? 0 : activeTrail.points[activeTrail.points.Count - 1].distance2Src + Vector3.Distance(activeTrail.points[activeTrail.points.Count - 1].position, position);
-
 			///Override Forward to be implemented in the future. 
 
 			activeTrail.points.Add(point);
@@ -360,12 +437,17 @@ namespace Mistral.Effects.Trail
 
 #region Private Methods
 
+		/// <summary>
+		/// Help a trail generate its own Mesh. 
+		/// </summary>
+		/// <param name="trail"></param>
 		private void GenerateMesh(TrailGraphics trail)
 		{
 			trail.mesh.Clear(false);
 			Vector3 cameraForward = Camera.main.transform.forward;
 			if (parameter.isForwardOverrided)
 				cameraForward = parameter.forwardOverride;
+			cameraForward = (Camera.main.transform.position - m_transform.position).normalized;
 			trail.activeCount = ActivePointsNumber(trail);
 
 			///No way to draw a Mesh with only 2 vertices or even less. Exit.
@@ -442,6 +524,7 @@ namespace Mistral.Effects.Trail
 
 			///So now comes the Exciting part. CONG! 
 			trail.mesh.vertices = trail.vertices;
+			///Setting Indices array directly to mesh also works. 
 			trail.mesh.SetIndices(trail.indices, MeshTopology.Triangles, 0);
 			trail.mesh.uv = trail.uvs;
 			trail.mesh.normals = trail.normals;
@@ -450,15 +533,28 @@ namespace Mistral.Effects.Trail
 
 		private void DrawMesh(Mesh trailMesh, Material mat)
 		{
-
+			///DrawMesh or DrawMeshNow? Sha sha fen bu qing. 
+			Graphics.DrawMesh(trailMesh, Matrix4x4.identity, mat, gameObject.layer);
 		}
 
+		/// <summary>
+		/// Updates points' positions from time to time. 
+		/// </summary>
+		/// <param name="line"></param>
+		/// <param name="deltaTime"></param>
 		private void UpdatePoints(TrailGraphics line, float deltaTime)
 		{
-
-
+			for (int i = 0; i < line.points.Count; i++)
+			{
+				line.points[i].Update(deltaTime);
+			}
 		}
 
+		/// <summary>
+		/// Count the points whose life time have not passed yet. 
+		/// </summary>
+		/// <param name="trail"></param>
+		/// <returns></returns>
 		private int ActivePointsNumber(TrailGraphics trail)
 		{
 			int count = 0;
@@ -472,7 +568,10 @@ namespace Mistral.Effects.Trail
 			return count;
 		}
 
-		private void CheckEmiChange()
+		/// <summary>
+		/// Just in case the Emission is suddenly shut-down or activated. 
+		/// </summary>
+		private void CheckEmitChange()
 		{
 			if (isEmitting != Emit)
 			{

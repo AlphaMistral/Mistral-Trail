@@ -15,6 +15,12 @@ using System.Collections.Generic;
 
 namespace Mistral.Utility.DataStructure
 {
+	/// <summary>
+	/// The Object Pool based memory manager. 
+	/// Please note that currently this RingBuffer has not been fully developed yet and thus runtime errors could occur without any 
+	/// helpful exception generated. Good luck and have fun. 
+	/// </summary>
+	/// <typeparam name="T"></typeparam>
 	public class RingBuffer<T> : IEnumerable, IEnumerable<T>, ICollection<T>, IList<T>
 	{
 		#region Public Variables
@@ -134,7 +140,7 @@ namespace Mistral.Utility.DataStructure
 			}
 			set
 			{
-
+				Insert(idx, value);
 			}
 		}
 
@@ -207,7 +213,5 @@ namespace Mistral.Utility.DataStructure
 		}
 
 		#endregion
-
 	}
-
 }
