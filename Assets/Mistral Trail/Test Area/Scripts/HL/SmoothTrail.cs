@@ -104,14 +104,14 @@ namespace Mistral.Effects.Trail
 
 		protected override int GetMaxPoints()
 		{
-			return maxPointNumber;
+			return maxPointNumber * (pointsInMiddle + 1);
 		}
 
 		protected override void UpdateTrail(TrailGraphics trail, float deltaTime)
 		{
 			if (!trail.activeSelf)
 				return;
-
+			
 			int trailPointIdx = 0;
 			for (int i = 0; i < controlPoints.Count; i++)
 			{
@@ -148,7 +148,7 @@ namespace Mistral.Effects.Trail
 					for (int j = 0; j < pointsInMiddle; j++)
 					{
 						float t = ( ( (float)j + 1 ) / ( (float)pointsInMiddle + 1 ) );
-						trail.points[trailPointIdx].position = Bezier(t, controlPoints[i].position, cp1, controlPoints[i + 1].position, cp2);
+						trail.points[trailPointIdx].position = Bezier(t, controlPoints[i].position, cp1, cp2, controlPoints[i + 1].position);
 						trail.points[trailPointIdx].timeSoFar = Mathf.Lerp(current.timeSoFar, next.timeSoFar, t);
 
 						///Forward goes here. 
@@ -193,7 +193,7 @@ namespace Mistral.Effects.Trail
 			float uuu = uu * u;
 			float ttt = tt * t;
 
-			return uuu * p1 + 3 * uu * t * p2 + 3 * u * tt * p3 + ttt * p4;
+			return (uuu * p1 + 3 * uu * t * p2 + 3 * u * tt * p3 + ttt * p4);
 		}
 
 		#endregion
