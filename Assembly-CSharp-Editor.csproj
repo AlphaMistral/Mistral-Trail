@@ -6,10 +6,10 @@
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <RootNamespace></RootNamespace>
-    <ProjectGuid>{E0B21319-1014-6350-B5B9-B0BC38C13C74}</ProjectGuid>
+    <ProjectGuid>{651BC954-D63A-B946-F336-18A6A06AF43A}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <AssemblyName>Assembly-CSharp</AssemblyName>
+    <AssemblyName>Assembly-CSharp-Editor</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <BaseDirectory>Assets</BaseDirectory>
@@ -46,56 +46,88 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-     <Compile Include="Assets\Mistral Trail\Test Area\Scripts\Core\TrailBase.cs" />
-     <Compile Include="Assets\Mistral Trail\Test Area\Scripts\HL\SimpleTrail.cs" />
-     <Compile Include="Assets\Mistral Trail\Test Area\Scripts\HL\SmoothTrail.cs" />
-     <Compile Include="Assets\Mistral Trail\Test Area\Scripts\ShowCase\Rotate.cs" />
-     <Compile Include="Assets\Mistral Trail\Test Area\Scripts\Utility\DataStructure\RingBuffer.cs" />
-     <Compile Include="Assets\PigeonCoopToolkit\Effects\Trails\SmokePlume.cs" />
-     <Compile Include="Assets\PigeonCoopToolkit\Effects\Trails\SmokeTrail.cs" />
-     <Compile Include="Assets\PigeonCoopToolkit\Effects\Trails\SmoothTrail.cs" />
-     <Compile Include="Assets\PigeonCoopToolkit\Effects\Trails\Trail.cs" />
-     <Compile Include="Assets\PigeonCoopToolkit\Effects\Trails\TrailRenderer_Base.cs" />
-     <Compile Include="Assets\PigeonCoopToolkit\Shared\Generic\VersionInformation.cs" />
-     <Compile Include="Assets\PigeonCoopToolkit\Shared\Utillities\CircularBuffer.cs" />
-     <Compile Include="Assets\PigeonCoopToolkit\Shared\Utillities\GizmosExtra.cs" />
-     <Compile Include="Assets\PigeonCoopToolkit\Shared\Utillities\Range.cs" />
-     <Compile Include="Assets\PigeonCoopToolkit\__Effects (Trails) Examples\Scripts\AlwaysForward.cs" />
-     <Compile Include="Assets\PigeonCoopToolkit\__Effects (Trails) Examples\Scripts\ConstForce.cs" />
-     <Compile Include="Assets\PigeonCoopToolkit\__Effects (Trails) Examples\Scripts\DestroyAfterTime.cs" />
-     <Compile Include="Assets\PigeonCoopToolkit\__Effects (Trails) Examples\Scripts\FPSController.cs" />
-     <Compile Include="Assets\PigeonCoopToolkit\__Effects (Trails) Examples\Scripts\FPSWeaponTrigger.cs" />
-     <Compile Include="Assets\PigeonCoopToolkit\__Effects (Trails) Examples\Scripts\MouseFollower.cs" />
-     <Compile Include="Assets\PigeonCoopToolkit\__Effects (Trails) Examples\Scripts\Orbiter.cs" />
-     <Compile Include="Assets\PigeonCoopToolkit\__Effects (Trails) Examples\Scripts\PitchShifter.cs" />
-     <Compile Include="Assets\PigeonCoopToolkit\__Effects (Trails) Examples\Scripts\TankAlwaysForward.cs" />
-     <Compile Include="Assets\PigeonCoopToolkit\__Effects (Trails) Examples\Scripts\TankController.cs" />
-     <Compile Include="Assets\PigeonCoopToolkit\__Effects (Trails) Examples\Scripts\TankProjectile.cs" />
-     <Compile Include="Assets\PigeonCoopToolkit\__Effects (Trails) Examples\Scripts\TankTranslator.cs" />
-     <Compile Include="Assets\PigeonCoopToolkit\__Effects (Trails) Examples\Scripts\TankWeaponController.cs" />
+     <Compile Include="Assets\PigeonCoopToolkit\Effects\Trails\Editor\ExecutionOrderSetter.cs" />
+     <Compile Include="Assets\PigeonCoopToolkit\Effects\Trails\Editor\InfoDialogueSpawner.cs" />
+     <Compile Include="Assets\PigeonCoopToolkit\Effects\Trails\Editor\SmokePlumeEditor.cs" />
+     <Compile Include="Assets\PigeonCoopToolkit\Effects\Trails\Editor\SmokeTrailEditor.cs" />
+     <Compile Include="Assets\PigeonCoopToolkit\Effects\Trails\Editor\SmoothTrailEditor.cs" />
+     <Compile Include="Assets\PigeonCoopToolkit\Effects\Trails\Editor\TrailEditor.cs" />
+     <Compile Include="Assets\PigeonCoopToolkit\Effects\Trails\Editor\TrailEditor_Base.cs" />
+     <Compile Include="Assets\PigeonCoopToolkit\Effects\Trails\Editor\TrailPreviewUtillity.cs" />
+     <Compile Include="Assets\PigeonCoopToolkit\Shared\Generic\Editor\InfoDialogue.cs" />
+     <Compile Include="Assets\PigeonCoopToolkit\Shared\Utillities\Editor\RangePropertyDrawer.cs" />
      <None Include="Assets\PigeonCoopToolkit\__SharedDemoAssets\_Shaders\Unlit Transparent Color.shader" />
      <None Include="Assets\Mistral Trail\Test Area\Shaders\EffectDefult.shader" />
      <None Include="Assets\PigeonCoopToolkit\__SharedDemoAssets\Sword\sword License.txt" />
      <None Include="Assets\PigeonCoopToolkit\__SharedDemoAssets\a-104 Rifle\a-104 Rifle License.txt" />
      <None Include="Assets\PigeonCoopToolkit\__SharedDemoAssets\_Shaders\DiffuseColorMask.shader" />
+ <Reference Include="UnityEditor.Advertisements">
+ <HintPath>/Applications/Unity/Unity.app/Contents/UnityExtensions/Unity/Advertisements/Editor/UnityEditor.Advertisements.dll</HintPath>
+ </Reference>
+ <Reference Include="nunit.framework">
+ <HintPath>/Applications/Unity/Unity.app/Contents/UnityExtensions/Unity/EditorTestsRunner/Editor/nunit.framework.dll</HintPath>
+ </Reference>
+ <Reference Include="UnityEditor.EditorTestsRunner">
+ <HintPath>/Applications/Unity/Unity.app/Contents/UnityExtensions/Unity/EditorTestsRunner/Editor/UnityEditor.EditorTestsRunner.dll</HintPath>
+ </Reference>
  <Reference Include="UnityEngine.UI">
  <HintPath>/Applications/Unity/Unity.app/Contents/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
+ </Reference>
+ <Reference Include="UnityEditor.UI">
+ <HintPath>/Applications/Unity/Unity.app/Contents/UnityExtensions/Unity/GUISystem/Editor/UnityEditor.UI.dll</HintPath>
  </Reference>
  <Reference Include="UnityEngine.Networking">
  <HintPath>/Applications/Unity/Unity.app/Contents/UnityExtensions/Unity/Networking/UnityEngine.Networking.dll</HintPath>
  </Reference>
+ <Reference Include="UnityEditor.Networking">
+ <HintPath>/Applications/Unity/Unity.app/Contents/UnityExtensions/Unity/Networking/Editor/UnityEditor.Networking.dll</HintPath>
+ </Reference>
+ <Reference Include="UnityEditor.PlaymodeTestsRunner">
+ <HintPath>/Applications/Unity/Unity.app/Contents/UnityExtensions/Unity/PlaymodeTestsRunner/Editor/UnityEditor.PlaymodeTestsRunner.dll</HintPath>
+ </Reference>
  <Reference Include="UnityEngine.PlaymodeTestsRunner">
  <HintPath>/Applications/Unity/Unity.app/Contents/UnityExtensions/Unity/PlaymodeTestsRunner/UnityEngine.PlaymodeTestsRunner.dll</HintPath>
+ </Reference>
+ <Reference Include="UnityEditor.TreeEditor">
+ <HintPath>/Applications/Unity/Unity.app/Contents/UnityExtensions/Unity/TreeEditor/Editor/UnityEditor.TreeEditor.dll</HintPath>
  </Reference>
  <Reference Include="UnityEngine.Analytics">
  <HintPath>/Applications/Unity/Unity.app/Contents/UnityExtensions/Unity/UnityAnalytics/UnityEngine.Analytics.dll</HintPath>
  </Reference>
+ <Reference Include="UnityEditor.Analytics">
+ <HintPath>/Applications/Unity/Unity.app/Contents/UnityExtensions/Unity/UnityAnalytics/Editor/UnityEditor.Analytics.dll</HintPath>
+ </Reference>
+ <Reference Include="UnityEditor.HoloLens">
+ <HintPath>/Applications/Unity/Unity.app/Contents/UnityExtensions/Unity/UnityHoloLens/Editor/UnityEditor.HoloLens.dll</HintPath>
+ </Reference>
  <Reference Include="UnityEngine.HoloLens">
  <HintPath>/Applications/Unity/Unity.app/Contents/UnityExtensions/Unity/UnityHoloLens/RuntimeEditor/UnityEngine.HoloLens.dll</HintPath>
+ </Reference>
+ <Reference Include="UnityEditor.VR">
+ <HintPath>/Applications/Unity/Unity.app/Contents/UnityExtensions/Unity/UnityVR/Editor/UnityEditor.VR.dll</HintPath>
  </Reference>
  <Reference Include="UnityEngine.VR">
  <HintPath>/Applications/Unity/Unity.app/Contents/UnityExtensions/Unity/UnityVR/RuntimeEditor/UnityEngine.VR.dll</HintPath>
  </Reference>
+ <Reference Include="UnityEditor.Graphs">
+ <HintPath>/Applications/Unity/Unity.app/Contents/Managed/UnityEditor.Graphs.dll</HintPath>
+ </Reference>
+ <Reference Include="UnityEditor.iOS.Extensions">
+ <HintPath>/Applications/Unity/PlaybackEngines/iOSSupport/UnityEditor.iOS.Extensions.dll</HintPath>
+ </Reference>
+ <Reference Include="UnityEditor.OSXStandalone.Extensions">
+ <HintPath>/Applications/Unity/Unity.app/Contents/PlaybackEngines/macstandalonesupport/UnityEditor.OSXStandalone.Extensions.dll</HintPath>
+ </Reference>
+ <Reference Include="UnityEditor.iOS.Extensions.Xcode">
+ <HintPath>/Applications/Unity/PlaybackEngines/iOSSupport/UnityEditor.iOS.Extensions.Xcode.dll</HintPath>
+ </Reference>
+ <Reference Include="UnityEditor.iOS.Extensions.Common">
+ <HintPath>/Applications/Unity/PlaybackEngines/iOSSupport/UnityEditor.iOS.Extensions.Common.dll</HintPath>
+ </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="Assembly-CSharp.csproj">
+      <Project>{E0B21319-1014-6350-B5B9-B0BC38C13C74}</Project>      <Name>Assembly-CSharp</Name>    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
