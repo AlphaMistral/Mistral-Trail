@@ -11,6 +11,9 @@ using UnityEngine;
 
 namespace Mistral.Effects.Trail
 {
+	/// <summary>
+	/// Creates a simple and continuous trail. 
+	/// </summary>
 	public class SimpleTrail : TrailBase
 	{
 		#region Public Variables

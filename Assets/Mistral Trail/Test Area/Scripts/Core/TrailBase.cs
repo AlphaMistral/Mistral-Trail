@@ -18,6 +18,19 @@ namespace Mistral.Effects.Trail
 	#region SubClasses
 
 	/// <summary>
+	/// Specifies how the trail should be oriented during the whole process. 
+	/// Local: The trail will be generated and oriented regarding a local vector.
+	/// World: Always facing a same orientation. 
+	/// LookAt: Persistently look at the specified transform. 
+	/// </summary>
+	public enum TrailOrientation
+	{
+		Local = 0,
+		World = 1,
+		LookAt = 2
+	}
+
+	/// <summary>
 	/// This Serializable Class Serves as a Parameter Storage for Trail Rendering. 
 	/// </summary>
 	[System.Serializable]
@@ -30,7 +43,8 @@ namespace Mistral.Effects.Trail
 		public bool isForwardOverrided;
 		public Vector3 forwardOverride;
 		public float quadScaleFactor;
-		public Transform forwardLookAt;
+		public Transform lookAt;
+		public TrailOrientation orientationType;
     }
 
 	/// <summary>
@@ -59,7 +73,7 @@ namespace Mistral.Effects.Trail
 		public float timeSoFar = 0;
 
 		/// <summary>
-		/// The distance from the point to the source point. 
+		/// The distance from the point to the source point -- where it is first instantiated. 
 		/// </summary>
 		public float distance2Src = 0;
 
@@ -235,6 +249,21 @@ namespace Mistral.Effects.Trail
 			m_transform = transform;
 			isEmitting = Emit;
 
+			if (parameter.orientationType == TrailOrientation.LookAt && parameter.lookAt == null)
+			{
+				if (Camera.main != null)
+				{
+					parameter.lookAt = Camera.main.transform;
+					Debug.Log(gameObject.name + ": 未指定面向物体, 因此默认面向主摄像机. ");
+				}
+				else
+				{
+					parameter.orientationType = TrailOrientation.Local;
+					parameter.forwardOverride = Vector3.forward;
+					Debug.Log(gameObject.name + ": 无法指定当前Trail的朝向, 为避免错误转化为Local. ");
+				}
+			}
+
 			if (isEmitting)
 			{
 				activeTrail = new TrailGraphics(GetMaxPoints());
@@ -243,6 +272,10 @@ namespace Mistral.Effects.Trail
 			}
 		}
 
+		/// <summary>
+		/// Subclasses are not encouraged to Override Awake. 
+		/// For any initialization operations please Override Start. 
+		/// </summary>
 		protected virtual void Start()
 		{
 
@@ -253,12 +286,15 @@ namespace Mistral.Effects.Trail
 		/// </summary>
 		protected virtual void LateUpdate()
 		{
+			///Management Function. Ensure that it is called only once. 
 			if (isDrawing)
 				return;
 			isDrawing = true;
 
 			foreach(KeyValuePair<Material, List<TrailGraphics>> pair in mat2Trail)
 			{
+				///Combine first. 
+				///We generate plenty of meshes but are actually adjacent to each other. 
 				CombineInstance[] combine = new CombineInstance[pair.Value.Count];
 				for(int i = 0;i < pair.Value.Count;i++)
 				{
@@ -285,6 +321,7 @@ namespace Mistral.Effects.Trail
 		{
 			///If we are generating Meshes, we don't want to draw anything. 
 			///So simply destroy any mesh before generating anything. 
+			///Obviously we only want to do this once. 
 			if(isDrawing)
 			{
 				isDrawing = false;
@@ -318,6 +355,7 @@ namespace Mistral.Effects.Trail
 			}
 
 			///IMPROVEMENT: This section is extremely expensive! 
+			///Unless ABOSOLUTELY NECESSARY, do not keeping turning emit ON and OFF! 
 			for (int i = fadingTrails.Count - 1; i >= 0; i--)
 			{
 				if (fadingTrails[i] == null || fadingTrails[i].points.Any(a => a.timeSoFar < parameter.lifeTime) == false)
@@ -431,13 +469,14 @@ namespace Mistral.Effects.Trail
 			point.position = position;
 			point.index = activeTrail.points.Count == 0 ? 0 : activeTrail.points[activeTrail.points.Count - 1].index + 1;
 			InitializeNewPoint(point);
-			point.distance2Src = activeTrail.points.Count == 0 ? 0 : activeTrail.points[activeTrail.points.Count - 1].distance2Src + Vector3.Distance(activeTrail.points[activeTrail.points.Count - 1].position, position);
+			point.distance2Src = activeTrail.points.Count == 0 ? 0 : activeTrail.points[activeTrail.points.Count - 1].distance2Src + 
+								 Vector3.Distance(activeTrail.points[activeTrail.points.Count - 1].position, position);
 			///Override Forward to be implemented in the future. 
 
 			activeTrail.points.Add(point);
 		}
 
-#endregion
+		#endregion
 
 		#region Private Methods
 
@@ -449,9 +488,24 @@ namespace Mistral.Effects.Trail
 		{
 			trail.mesh.Clear(false);
 			Vector3 cameraForward = Camera.main.transform.forward;
-			if (parameter.isForwardOverrided)
-				cameraForward = parameter.forwardOverride;
-			cameraForward = (Camera.main.transform.position - m_transform.position).normalized;
+
+			///Determine the trail forward direction.
+			switch (parameter.orientationType)
+			{
+				case TrailOrientation.LookAt:
+					cameraForward = (parameter.lookAt.position - m_transform.position).normalized;
+					break;
+
+				case TrailOrientation.Local:
+					cameraForward = m_transform.forward;
+					break;
+				case TrailOrientation.World:
+					cameraForward = parameter.forwardOverride;
+					break;
+
+				default:
+					break;
+			}
 			trail.activeCount = ActivePointsNumber(trail);
 
 			///No way to draw a Mesh with only 2 vertices or even less. Exit.
@@ -471,7 +525,7 @@ namespace Mistral.Effects.Trail
 
 				if (i < trail.points.Count - 1)
 				{
-					cross = Vector3.Cross((trail.points[i + 1].position - trail.points[i].position).normalized, cameraForward).normalized;
+					cross = Vector3.Cross((trail.points[i + 1].position - tp.position).normalized, cameraForward).normalized;
 				}
 				else
 				{
@@ -556,6 +610,8 @@ namespace Mistral.Effects.Trail
 
 		/// <summary>
 		/// Count the points whose life time have not passed yet. 
+		/// We do nothing to those whose life time have passed. 
+		/// Because we are using RingBuffer as an Object Pool :) 
 		/// </summary>
 		/// <param name="trail"></param>
 		/// <returns></returns>
