@@ -9,6 +9,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+using Mistral.Utility.MathX;
 using Mistral.Utility.DataStructure;
 
 namespace Mistral.Effects.Trail
@@ -178,7 +179,7 @@ namespace Mistral.Effects.Trail
 					for (int j = 0; j < pointsInMiddle; j++)
 					{
 						float t = ( ( (float)j + 1 ) / ( (float)pointsInMiddle + 1 ) );
-						trail.points[trailPointIdx].position = Bezier(t, controlPoints[i].position, cp1, cp2, controlPoints[i + 1].position);
+						trail.points[trailPointIdx].position = Bezier.CalculateCubic(t, controlPoints[i].position, cp1, cp2, controlPoints[i + 1].position);
 						trail.points[trailPointIdx].timeSoFar = Mathf.Lerp(current.timeSoFar, next.timeSoFar, t);
 
 						trail.points[trailPointIdx].forwardDirection = Vector3.Lerp(current.forwardDirection, next.forwardDirection, t);
@@ -230,17 +231,6 @@ namespace Mistral.Effects.Trail
 
 			controlPoints.Add(ap);
 
-		}
-
-		private Vector3 Bezier(float t, Vector3 p1, Vector3 p2, Vector3 p3, Vector3 p4)
-		{
-			float u = 1 - t;
-			float tt = t * t;
-			float uu = u * u;
-			float uuu = uu * u;
-			float ttt = tt * t;
-
-			return (uuu * p1 + 3 * uu * t * p2 + 3 * u * tt * p3 + ttt * p4);
 		}
 
 		#endregion

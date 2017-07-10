@@ -49,9 +49,11 @@
      <Compile Include="Assets\Mistral Trail\Scripts\Core\TrailBase.cs" />
      <Compile Include="Assets\Mistral Trail\Scripts\HL\SimpleTrail.cs" />
      <Compile Include="Assets\Mistral Trail\Scripts\HL\SmoothTrail.cs" />
+     <Compile Include="Assets\Mistral Trail\Scripts\ShowCase\MouseFollower.cs" />
      <Compile Include="Assets\Mistral Trail\Scripts\ShowCase\Rotate.cs" />
      <Compile Include="Assets\Mistral Trail\Scripts\Utility\DataStructure\RingBuffer.cs" />
-     <Compile Include="Assets\Mistral Trail\Scripts\Utility\MouseFollower.cs" />
+     <Compile Include="Assets\Mistral Trail\Scripts\Utility\Math\B_Spline.cs" />
+     <Compile Include="Assets\Mistral Trail\Scripts\Utility\Math\Bezier.cs" />
      <Compile Include="Assets\PigeonCoopToolkit\Effects\Trails\SmokePlume.cs" />
      <Compile Include="Assets\PigeonCoopToolkit\Effects\Trails\SmokeTrail.cs" />
      <Compile Include="Assets\PigeonCoopToolkit\Effects\Trails\SmoothTrail.cs" />
