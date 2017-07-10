@@ -73,7 +73,7 @@ namespace Mistral.Effects.Trail
 				distanceMoved += Vector3.Distance(m_transform.position, lastPosition);
 				if (!Mathf.Approximately(distanceMoved, 0.0f) && distanceMoved >= minVertexDistance)
 				{
-					AddControlPoint(lastPosition);
+					AddControlPoint(m_transform.position);
 					distanceMoved = 0.0f;
 				}
 				else
@@ -187,6 +187,7 @@ namespace Mistral.Effects.Trail
 					}
 				}
 			}
+
 			int lastCPIdx = (pointsInMiddle + 1) * (controlPoints.Count - 1);
 			int prevCPIdx = lastCPIdx - pointsInMiddle - 1;
 			int activeCount = lastCPIdx + 1;
@@ -239,7 +240,7 @@ namespace Mistral.Effects.Trail
 			float uuu = uu * u;
 			float ttt = tt * t;
 
-			return (uuu * p1 + 3 * uu * t * p2 + 3 * u * tt * p3 + ttt * p4);
+			return 0.3f * (uuu * p1 + 3 * uu * t * p2 + 3 * u * tt * p3 + ttt * p4) / (uuu * 0.3f + 3f * uu * t * 0.3f + 3f * u * tt * 0.3f + ttt * 0.3f);
 		}
 
 		#endregion
