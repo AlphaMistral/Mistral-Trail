@@ -51,6 +51,7 @@
      <Compile Include="Assets\Mistral Trail\Test Area\Scripts\HL\SmoothTrail.cs" />
      <Compile Include="Assets\Mistral Trail\Test Area\Scripts\ShowCase\Rotate.cs" />
      <Compile Include="Assets\Mistral Trail\Test Area\Scripts\Utility\DataStructure\RingBuffer.cs" />
+     <Compile Include="Assets\Mistral Trail\Test Area\Scripts\Utility\MouseFollower.cs" />
      <Compile Include="Assets\PigeonCoopToolkit\Effects\Trails\SmokePlume.cs" />
      <Compile Include="Assets\PigeonCoopToolkit\Effects\Trails\SmokeTrail.cs" />
      <Compile Include="Assets\PigeonCoopToolkit\Effects\Trails\SmoothTrail.cs" />
@@ -65,7 +66,6 @@
      <Compile Include="Assets\PigeonCoopToolkit\__Effects (Trails) Examples\Scripts\DestroyAfterTime.cs" />
      <Compile Include="Assets\PigeonCoopToolkit\__Effects (Trails) Examples\Scripts\FPSController.cs" />
      <Compile Include="Assets\PigeonCoopToolkit\__Effects (Trails) Examples\Scripts\FPSWeaponTrigger.cs" />
-     <Compile Include="Assets\PigeonCoopToolkit\__Effects (Trails) Examples\Scripts\MouseFollower.cs" />
      <Compile Include="Assets\PigeonCoopToolkit\__Effects (Trails) Examples\Scripts\Orbiter.cs" />
      <Compile Include="Assets\PigeonCoopToolkit\__Effects (Trails) Examples\Scripts\PitchShifter.cs" />
      <Compile Include="Assets\PigeonCoopToolkit\__Effects (Trails) Examples\Scripts\TankAlwaysForward.cs" />

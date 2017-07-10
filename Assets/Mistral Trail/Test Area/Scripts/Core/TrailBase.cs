@@ -480,10 +480,10 @@ namespace Mistral.Effects.Trail
 					point.forwardDirection = (parameter.lookAt.position - position).normalized;
 					break;
 				case TrailOrientation.Local:
-					point.forwardDirection = transform.forward;
+					point.forwardDirection = m_transform.forward;
 					break;
 				case TrailOrientation.World:
-					point.forwardDirection = parameter.forwardOverride;
+					point.forwardDirection = parameter.forwardOverride.normalized;
 					break;
 				default:
 					break;
@@ -504,6 +504,7 @@ namespace Mistral.Effects.Trail
 		{
 			trail.mesh.Clear(false);
 			Vector3 cameraForward = Camera.main.transform.forward;
+
 			///Determine the trail forward direction.
 			switch (parameter.orientationType)
 			{
@@ -515,16 +516,13 @@ namespace Mistral.Effects.Trail
 					cameraForward = m_transform.forward;
 					break;
 				case TrailOrientation.World:
-					cameraForward = parameter.forwardOverride;
+					cameraForward = parameter.forwardOverride.normalized;
 					break;
 
 				default:
 					break;
 			}
-			if (parameter.isForwardOverrided)
-				cameraForward = parameter.forwardOverride;
-			cameraForward = (Camera.main.transform.position - m_transform.position).normalized;
-			cameraForward = Vector3.forward;
+
 			trail.activeCount = ActivePointsNumber(trail);
 
 			///No way to draw a Mesh with only 2 vertices or even less. Exit.
@@ -539,6 +537,9 @@ namespace Mistral.Effects.Trail
 
 				if (timeFraction > 1)
 					continue;
+
+				if (parameter.orientationType == TrailOrientation.Local)
+					cameraForward = tp.forwardDirection;
 
 				Vector3 cross = Vector3.zero;
 

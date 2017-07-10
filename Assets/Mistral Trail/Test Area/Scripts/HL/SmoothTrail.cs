@@ -145,10 +145,7 @@ namespace Mistral.Effects.Trail
 			{
 				trail.points[trailPointIdx].position = controlPoints[i].position;
 
-				if (parameter.orientationType == TrailOrientation.LookAt)
-				{
-					
-				}
+				trail.points[trailPointIdx].forwardDirection = controlPoints[i].forward;
 
 				trailPointIdx++;
 				if (i < controlPoints.Count - 1)
@@ -184,10 +181,7 @@ namespace Mistral.Effects.Trail
 						trail.points[trailPointIdx].position = Bezier(t, controlPoints[i].position, cp1, cp2, controlPoints[i + 1].position);
 						trail.points[trailPointIdx].timeSoFar = Mathf.Lerp(current.timeSoFar, next.timeSoFar, t);
 
-						if (parameter.orientationType == TrailOrientation.LookAt)
-						{
-							trail.points[trailPointIdx].forwardDirection = Vector3.Lerp(current.forwardDirection, next.forwardDirection, t);
-						}
+						trail.points[trailPointIdx].forwardDirection = Vector3.Lerp(current.forwardDirection, next.forwardDirection, t);
 
 						trailPointIdx++;
 					}
@@ -209,15 +203,30 @@ namespace Mistral.Effects.Trail
 
 		#region Private Methods
 
-		private void AddControlPoint(Vector3 position)
+		private void AddControlPoint(Vector3 pos)
 		{
 			for (int i = 0; i < pointsInMiddle; i++)
 			{
-				AddPoint(new TrailPoint(), position);
+				AddPoint(new TrailPoint(), pos);
 			}
-			AddPoint(new TrailPoint(), position);
-			AdditionalPoint ap = new AdditionalPoint { position = position };
-			///Forward goes here. 
+			AddPoint(new TrailPoint(), pos);
+			AdditionalPoint ap = new AdditionalPoint { position = pos };
+
+			switch (parameter.orientationType)
+			{
+				case TrailOrientation.World:
+					ap.forward = parameter.forwardOverride;
+					break;
+				case TrailOrientation.Local:
+					ap.forward = m_transform.forward;
+					break;
+				case TrailOrientation.LookAt:
+					ap.forward = (parameter.lookAt.position - m_transform.position).normalized;
+					break;
+				default:
+					break;
+			}
+
 			controlPoints.Add(ap);
 
 		}
