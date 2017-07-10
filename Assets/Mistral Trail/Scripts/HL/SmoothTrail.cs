@@ -240,7 +240,7 @@ namespace Mistral.Effects.Trail
 			float uuu = uu * u;
 			float ttt = tt * t;
 
-			return 0.3f * (uuu * p1 + 3 * uu * t * p2 + 3 * u * tt * p3 + ttt * p4) / (uuu * 0.3f + 3f * uu * t * 0.3f + 3f * u * tt * 0.3f + ttt * 0.3f);
+			return (uuu * p1 + 3 * uu * t * p2 + 3 * u * tt * p3 + ttt * p4);
 		}
 
 		#endregion

@@ -57,7 +57,7 @@
      <Compile Include="Assets\PigeonCoopToolkit\Shared\Generic\Editor\InfoDialogue.cs" />
      <Compile Include="Assets\PigeonCoopToolkit\Shared\Utillities\Editor\RangePropertyDrawer.cs" />
      <None Include="Assets\PigeonCoopToolkit\__SharedDemoAssets\_Shaders\Unlit Transparent Color.shader" />
-     <None Include="Assets\Mistral Trail\Test Area\Shaders\EffectDefult.shader" />
+     <None Include="Assets\Mistral Trail\Shaders\EffectDefult.shader" />
      <None Include="Assets\PigeonCoopToolkit\__SharedDemoAssets\Sword\sword License.txt" />
      <None Include="Assets\PigeonCoopToolkit\__SharedDemoAssets\a-104 Rifle\a-104 Rifle License.txt" />
      <None Include="Assets\PigeonCoopToolkit\__SharedDemoAssets\_Shaders\DiffuseColorMask.shader" />
