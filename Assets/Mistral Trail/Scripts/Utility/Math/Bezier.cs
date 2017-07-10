@@ -35,7 +35,7 @@ namespace Mistral.Utility.MathX
 			float uuu = uu * u;
 			float ttt = tt * t;
 
-			return uuu * p0 + 3 * uuu * t * p1 + 3 * u * tt * p2 + ttt * p3;
+			return uuu * p0 + 3 * uu * t * p1 + 3 * u * tt * p2 + ttt * p3;
 		}
 
 		#endregion
