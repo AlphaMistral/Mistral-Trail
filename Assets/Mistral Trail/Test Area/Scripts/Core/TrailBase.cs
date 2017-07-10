@@ -40,11 +40,12 @@ namespace Mistral.Effects.Trail
         public float lifeTime;
         public AnimationCurve sizeOverLife = new AnimationCurve();
         public Gradient colorOverLife;
-		public bool isForwardOverrided;
-		public Vector3 forwardOverride;
+
 		public float quadScaleFactor;
 		public Transform lookAt;
 		public TrailOrientation orientationType;
+		public bool isForwardOverrided;
+		public Vector3 forwardOverride;
     }
 
 	/// <summary>
@@ -473,6 +474,21 @@ namespace Mistral.Effects.Trail
 								 Vector3.Distance(activeTrail.points[activeTrail.points.Count - 1].position, position);
 			///Override Forward to be implemented in the future. 
 
+			switch (parameter.orientationType)
+			{
+				case TrailOrientation.LookAt:
+					point.forwardDirection = (parameter.lookAt.position - position).normalized;
+					break;
+				case TrailOrientation.Local:
+					point.forwardDirection = transform.forward;
+					break;
+				case TrailOrientation.World:
+					point.forwardDirection = parameter.forwardOverride;
+					break;
+				default:
+					break;
+			}
+
 			activeTrail.points.Add(point);
 		}
 
@@ -488,7 +504,6 @@ namespace Mistral.Effects.Trail
 		{
 			trail.mesh.Clear(false);
 			Vector3 cameraForward = Camera.main.transform.forward;
-
 			///Determine the trail forward direction.
 			switch (parameter.orientationType)
 			{
@@ -506,6 +521,10 @@ namespace Mistral.Effects.Trail
 				default:
 					break;
 			}
+			if (parameter.isForwardOverrided)
+				cameraForward = parameter.forwardOverride;
+			cameraForward = (Camera.main.transform.position - m_transform.position).normalized;
+			cameraForward = Vector3.forward;
 			trail.activeCount = ActivePointsNumber(trail);
 
 			///No way to draw a Mesh with only 2 vertices or even less. Exit.

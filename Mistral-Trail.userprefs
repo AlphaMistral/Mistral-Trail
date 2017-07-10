@@ -4,7 +4,7 @@
     <Files>
       <File FileName="Assets/Mistral Trail/Test Area/Scripts/Core/TrailBase.cs" Line="441" Column="4" />
       <File FileName="Assets/Mistral Trail/Test Area/Scripts/HL/SimpleTrail.cs" Line="12" Column="32" />
-      <File FileName="Assets/Mistral Trail/Test Area/Scripts/HL/SmoothTrail.cs" Line="48" Column="17" />
+      <File FileName="Assets/Mistral Trail/Test Area/Scripts/HL/SmoothTrail.cs" Line="202" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

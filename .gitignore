@@ -3,3 +3,5 @@ Library/
 ProjectSettings/
 Temp/
 Assets/PigeonCoopToolkit/
+*.csproj
+*.userprefs
