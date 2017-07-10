@@ -9,6 +9,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+using Mistral.Utility.MathX;
 using Mistral.Utility.DataStructure;
 
 namespace Mistral.Effects.Trail
@@ -73,13 +74,26 @@ namespace Mistral.Effects.Trail
 				distanceMoved += Vector3.Distance(m_transform.position, lastPosition);
 				if (!Mathf.Approximately(distanceMoved, 0.0f) && distanceMoved >= minVertexDistance)
 				{
-					AddControlPoint(lastPosition);
+					AddControlPoint(m_transform.position);
 					distanceMoved = 0.0f;
 				}
 				else
 				{
 					controlPoints[controlPoints.Count - 1].position = m_transform.position;
-					///Forward Override goes here
+					switch (parameter.orientationType)
+					{
+						case TrailOrientation.LookAt:
+							controlPoints[controlPoints.Count - 1].forward = (parameter.lookAt.position - m_transform.position).normalized;
+							break;
+						case TrailOrientation.Local:
+							controlPoints[controlPoints.Count - 1].forward = transform.forward;
+							break;
+						case TrailOrientation.World:
+							controlPoints[controlPoints.Count - 1].forward = parameter.forwardOverride;
+							break;
+						default:
+							break;
+					}
 				}
 				lastPosition = m_transform.position;
 			}
@@ -97,7 +111,22 @@ namespace Mistral.Effects.Trail
 			distanceMoved = 0.0f;
 			controlPoints = new RingBuffer<AdditionalPoint>(maxPointNumber);
 			controlPoints.Add(new AdditionalPoint { position = lastPosition });
-			///Forward Override goes here
+
+			switch (parameter.orientationType)
+			{
+				case TrailOrientation.LookAt:
+					controlPoints[0].forward = (parameter.lookAt.position - controlPoints[0].position).normalized;
+					break;
+				case TrailOrientation.Local:
+					controlPoints[0].forward = transform.forward;
+					break;
+				case TrailOrientation.World:
+					controlPoints[0].forward = parameter.forwardOverride;
+					break;
+				default:
+					break;
+			}
+
 			AddPoint(new TrailPoint(), lastPosition);
 			AddControlPoint(lastPosition);
 		}
@@ -116,7 +145,9 @@ namespace Mistral.Effects.Trail
 			for (int i = 0; i < controlPoints.Count; i++)
 			{
 				trail.points[trailPointIdx].position = controlPoints[i].position;
-				///Forward Override goes here
+
+				trail.points[trailPointIdx].forwardDirection = controlPoints[i].forward;
+
 				trailPointIdx++;
 				if (i < controlPoints.Count - 1)
 				{
@@ -148,14 +179,16 @@ namespace Mistral.Effects.Trail
 					for (int j = 0; j < pointsInMiddle; j++)
 					{
 						float t = ( ( (float)j + 1 ) / ( (float)pointsInMiddle + 1 ) );
-						trail.points[trailPointIdx].position = Bezier(t, controlPoints[i].position, cp1, cp2, controlPoints[i + 1].position);
+						trail.points[trailPointIdx].position = Bezier.CalculateCubic(t, controlPoints[i].position, cp1, cp2, controlPoints[i + 1].position);
 						trail.points[trailPointIdx].timeSoFar = Mathf.Lerp(current.timeSoFar, next.timeSoFar, t);
 
-						///Forward goes here. 
+						trail.points[trailPointIdx].forwardDirection = Vector3.Lerp(current.forwardDirection, next.forwardDirection, t);
+
 						trailPointIdx++;
 					}
 				}
 			}
+
 			int lastCPIdx = (pointsInMiddle + 1) * (controlPoints.Count - 1);
 			int prevCPIdx = lastCPIdx - pointsInMiddle - 1;
 			int activeCount = lastCPIdx + 1;
@@ -172,28 +205,32 @@ namespace Mistral.Effects.Trail
 
 		#region Private Methods
 
-		private void AddControlPoint(Vector3 position)
+		private void AddControlPoint(Vector3 pos)
 		{
 			for (int i = 0; i < pointsInMiddle; i++)
 			{
-				AddPoint(new TrailPoint(), position);
+				AddPoint(new TrailPoint(), pos);
 			}
-			AddPoint(new TrailPoint(), position);
-			AdditionalPoint ap = new AdditionalPoint { position = position };
-			///Forward goes here. 
+			AddPoint(new TrailPoint(), pos);
+			AdditionalPoint ap = new AdditionalPoint { position = pos };
+
+			switch (parameter.orientationType)
+			{
+				case TrailOrientation.World:
+					ap.forward = parameter.forwardOverride;
+					break;
+				case TrailOrientation.Local:
+					ap.forward = m_transform.forward;
+					break;
+				case TrailOrientation.LookAt:
+					ap.forward = (parameter.lookAt.position - m_transform.position).normalized;
+					break;
+				default:
+					break;
+			}
+
 			controlPoints.Add(ap);
 
-		}
-
-		private Vector3 Bezier(float t, Vector3 p1, Vector3 p2, Vector3 p3, Vector3 p4)
-		{
-			float u = 1 - t;
-			float tt = t * t;
-			float uu = u * u;
-			float uuu = uu * u;
-			float ttt = tt * t;
-
-			return (uuu * p1 + 3 * uu * t * p2 + 3 * u * tt * p3 + ttt * p4);
 		}
 
 		#endregion
