@@ -12,7 +12,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Mistral.Utility.File
+namespace Mistral.Utility.FileX
 {
 	/// <summary>
 	/// Manipulates Files and Directories. 
