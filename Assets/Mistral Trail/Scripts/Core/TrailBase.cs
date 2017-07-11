@@ -674,6 +674,19 @@ namespace Mistral.Effects.Trail
 
 		#endregion
 
+		#region Public Methods
+
+		/// <summary>
+		/// Retrieves the Mesh of the TrailGraphics. 
+		/// </summary>
+		/// <returns>The trail mesh.</returns>
+		public Mesh GetTrailMesh()
+		{
+			return activeTrail.mesh;
+		}
+
+		#endregion
+
 	}
 
 	#endregion

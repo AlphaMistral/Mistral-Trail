@@ -58,6 +58,8 @@
      <Compile Include="Assets\Mistral Trail\Scripts\Utility\Math\Bezier.cs" />
      <Compile Include="Assets\Mistral Trail\Scripts\Utility\Model\MeshManager.cs" />
      <Compile Include="Assets\Mistral Trail\Scripts\Utility\Model\MeshSerializer.cs" />
+     <Compile Include="Assets\Mistral Trail\Test Area\TestReadMesh.cs" />
+     <Compile Include="Assets\Mistral Trail\Test Area\TestStoreMesh.cs" />
      <Compile Include="Assets\PigeonCoopToolkit\Effects\Trails\SmokePlume.cs" />
      <Compile Include="Assets\PigeonCoopToolkit\Effects\Trails\SmokeTrail.cs" />
      <Compile Include="Assets\PigeonCoopToolkit\Effects\Trails\SmoothTrail.cs" />

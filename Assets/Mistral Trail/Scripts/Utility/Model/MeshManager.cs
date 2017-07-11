@@ -12,6 +12,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+using Mistral.Utility.FileX;
+
 namespace Mistral.Utility.Model
 {
 	/// <summary>
@@ -23,8 +25,16 @@ namespace Mistral.Utility.Model
 
 		/// <summary>
 		/// Where the Meshes are stored. 
+		/// Since Application.dataPath is not a const. We can only use static here. 
+		/// Don't fucking temper with it! 
 		/// </summary>
-		private const string MESH_PATH = "Assets/MTR Generated/";
+		private static string MESH_PATH = Application.dataPath + "/MTR Generated/";
+
+		#endregion
+
+		#region Private Variables
+
+		private static bool isInitialized = false;
 
 		#endregion
 
@@ -32,6 +42,10 @@ namespace Mistral.Utility.Model
 
 		public static void SaveMeshToResource(Mesh mesh, string fileName)
 		{
+			if (!isInitialized)
+			{
+				Initialize();
+			}
 			///Check if the Mesh exists
 			string path = MESH_PATH + fileName + ".mtrmesh";
 			if (File.Exists(path))
@@ -42,6 +56,16 @@ namespace Mistral.Utility.Model
 
 			byte[] bytes = MeshSerializer.WriteMesh(mesh, true);
 			File.WriteAllBytes(path, bytes);
+		}
+
+		#endregion
+
+		#region Private Methods
+
+		private static void Initialize()
+		{
+			FileManager.TryCreateDirectory(MESH_PATH);
+			isInitialized = true;
 		}
 
 		#endregion

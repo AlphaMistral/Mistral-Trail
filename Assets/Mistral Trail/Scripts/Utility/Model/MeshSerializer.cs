@@ -39,8 +39,8 @@ namespace Mistral.Utility.Model
 
 			BinaryReader buffer = new BinaryReader(new MemoryStream(bytes));
 
-			int vertexNumber = buffer.ReadInt16();
-			int triangleNumber = buffer.ReadInt16();
+			int vertexNumber = buffer.ReadUInt16();
+			int triangleNumber = buffer.ReadUInt16();
 			byte format = buffer.ReadByte();
 
 			if (vertexNumber < 0 || vertexNumber > MAX_VERT_NUMBER)
@@ -130,8 +130,10 @@ namespace Mistral.Utility.Model
 			MemoryStream stream = new MemoryStream();
 			BinaryWriter buffer = new BinaryWriter(stream);
 
-			buffer.Write((ushort)vertices.Length);
-			buffer.Write((ushort)triangles.Length / 3);
+			var vertCount = (ushort)vertices.Length;
+			var triCount = (ushort)(triangles.Length / 3);
+			buffer.Write(vertCount);
+			buffer.Write(triCount);
 			buffer.Write(format);
 
 			WriteVector3Array16Bit(vertices, buffer);

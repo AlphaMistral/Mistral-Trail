@@ -7,3 +7,5 @@ Assets/PigeonCoopToolkit/
 *.userprefs
 *.dll
 *.dll.mdb
+obj/
+Assets/MTR Generated/
