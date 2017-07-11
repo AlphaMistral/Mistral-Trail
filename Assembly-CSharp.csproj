@@ -53,8 +53,10 @@
      <Compile Include="Assets\Mistral Trail\Scripts\ShowCase\MoveAlongTrail.cs" />
      <Compile Include="Assets\Mistral Trail\Scripts\ShowCase\Rotate.cs" />
      <Compile Include="Assets\Mistral Trail\Scripts\Utility\DataStructure\RingBuffer.cs" />
+     <Compile Include="Assets\Mistral Trail\Scripts\Utility\FIle\FileManager.cs" />
      <Compile Include="Assets\Mistral Trail\Scripts\Utility\Math\B_Spline.cs" />
      <Compile Include="Assets\Mistral Trail\Scripts\Utility\Math\Bezier.cs" />
+     <Compile Include="Assets\Mistral Trail\Scripts\Utility\Model\MeshManager.cs" />
      <Compile Include="Assets\Mistral Trail\Scripts\Utility\Model\MeshSerializer.cs" />
      <Compile Include="Assets\PigeonCoopToolkit\Effects\Trails\SmokePlume.cs" />
      <Compile Include="Assets\PigeonCoopToolkit\Effects\Trails\SmokeTrail.cs" />

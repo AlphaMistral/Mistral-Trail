@@ -5,3 +5,5 @@ Temp/
 Assets/PigeonCoopToolkit/
 *.csproj
 *.userprefs
+*.dll
+*.dll.mdb
