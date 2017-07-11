@@ -55,6 +55,7 @@
      <Compile Include="Assets\Mistral Trail\Scripts\Utility\DataStructure\RingBuffer.cs" />
      <Compile Include="Assets\Mistral Trail\Scripts\Utility\Math\B_Spline.cs" />
      <Compile Include="Assets\Mistral Trail\Scripts\Utility\Math\Bezier.cs" />
+     <Compile Include="Assets\Mistral Trail\Scripts\Utility\Model\MeshSerializer.cs" />
      <Compile Include="Assets\PigeonCoopToolkit\Effects\Trails\SmokePlume.cs" />
      <Compile Include="Assets\PigeonCoopToolkit\Effects\Trails\SmokeTrail.cs" />
      <Compile Include="Assets\PigeonCoopToolkit\Effects\Trails\SmoothTrail.cs" />
