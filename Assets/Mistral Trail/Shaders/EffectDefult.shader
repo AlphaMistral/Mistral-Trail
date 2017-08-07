@@ -54,7 +54,6 @@ Shader  "PhotonShader/Effect/Default"
 		{
 			CGPROGRAM
 
-
 			#pragma vertex vert
 			#pragma fragment frag
 			#pragma multi_compile_fog
@@ -187,7 +186,7 @@ Shader  "PhotonShader/Effect/Default"
 				#if FlowTex_On
 					o.uv34.zw = TransFormUV(v.uv,_FlowTex_ST);
 					o.uv34.zw = RotateUV(o.uv34.zw,_FlowTexRot);
-					o.uv34.zw +=  _Time.z * float2(_FlowTexX,_FlowTexY);
+					o.uv34.zw +=  _Time.z * float2(_FlowTexX,_FlowTexY) / 100000;
 				#endif
 				#if defined (INSTANCING_ON)
 				o.vertexColor = v.vertexColor * UNITY_ACCESS_INSTANCED_PROP(_Color) * _Multiplier;

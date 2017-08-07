@@ -296,6 +296,7 @@ namespace Mistral.Effects.Trail
 			{
 				///Combine first. 
 				///We generate plenty of meshes but are actually adjacent to each other. 
+				///Although we have some Heap operations here ... It actually worths! 
 				CombineInstance[] combine = new CombineInstance[pair.Value.Count];
 				for(int i = 0;i < pair.Value.Count;i++)
 				{
