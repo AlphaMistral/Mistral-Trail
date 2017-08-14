@@ -46,10 +46,13 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\Mistral Trail\External\FBX Exporter\Scripts\FbxExporter.cs" />
+     <Compile Include="Assets\Mistral Trail\External\FBX Exporter\Scripts\FbxExporter_impl.cs" />
      <Compile Include="Assets\Mistral Trail\Scripts\Core\TrailBase.cs" />
      <Compile Include="Assets\Mistral Trail\Scripts\Core\TrailTGABaker.cs" />
      <Compile Include="Assets\Mistral Trail\Scripts\HL\SimpleTrail.cs" />
      <Compile Include="Assets\Mistral Trail\Scripts\HL\SmoothTrail.cs" />
+     <Compile Include="Assets\Mistral Trail\Scripts\HL\StaticTrailBaker.cs" />
      <Compile Include="Assets\Mistral Trail\Scripts\ShowCase\MouseFollower.cs" />
      <Compile Include="Assets\Mistral Trail\Scripts\ShowCase\MoveAlongTrail.cs" />
      <Compile Include="Assets\Mistral Trail\Scripts\ShowCase\Rotate.cs" />
@@ -78,8 +81,6 @@
      <Compile Include="Assets\Skinner\SkinnerSource.cs" />
      <Compile Include="Assets\Skinner\SkinnerTrail.cs" />
      <Compile Include="Assets\Skinner\SkinnerTrailTemplate.cs" />
-     <Compile Include="Assets\UTJ\FbxExporter\Scripts\FbxExporter.cs" />
-     <Compile Include="Assets\UTJ\FbxExporter\Scripts\FbxExporter_impl.cs" />
      <None Include="Assets\Skinner\Shader\GlitchKernels.cginc" />
      <None Include="Assets\Skinner\Shader\ParticleMotion.cginc" />
      <None Include="Assets\Skinner\Shader\Replacement.cginc" />

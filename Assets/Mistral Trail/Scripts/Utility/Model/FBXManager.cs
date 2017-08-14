@@ -22,7 +22,7 @@ namespace Mistral.Utility.Model
 	{
 		#region Paths
 
-		private static string FBX_PATH = Application.dataPath + "/MTR Generated/";
+		private static string FBX_PATH = Application.dataPath + "/MTR Generated/FBX Models/";
 
 		#endregion
 
@@ -40,7 +40,10 @@ namespace Mistral.Utility.Model
 			{
 				Initialize();
 			}
-			FbxExporter exporter = new FbxExporter(FbxExporter.ExportOptions.defaultValue);
+			FbxExporter.ExportOptions options = FbxExporter.ExportOptions.defaultValue;
+			/// Make sure it is in meter. 
+			options.scale_factor = 100f;
+			FbxExporter exporter = new FbxExporter(options);
 			exporter.CreateScene(fileName);
 			exporter.AddNode(go);
 			var ret = exporter.Write(FBX_PATH + fileName + ".fbx", FbxExporter.Format.FbxBinary);

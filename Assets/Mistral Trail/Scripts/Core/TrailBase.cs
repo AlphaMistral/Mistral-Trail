@@ -46,6 +46,12 @@ namespace Mistral.Effects.Trail
 		public TrailOrientation orientationType;
 		public bool isForwardOverrided;
 		public Vector3 forwardOverride;
+
+		/// <summary>
+		/// Whether the Trail is a Stripe or a Crossed Pillar. 
+		/// DON'T TEMPER WITH THIS DURING RUNTIME! 
+		/// </summary>
+		public bool isCross;
     }
 
 	/// <summary>
@@ -129,7 +135,7 @@ namespace Mistral.Effects.Trail
 
 		#region ctor
 
-		public TrailGraphics(int number)
+		public TrailGraphics(int number, bool isCross)
 		{
 			mesh = new Mesh();
 
@@ -139,13 +145,17 @@ namespace Mistral.Effects.Trail
 			///Post-Comment -> At Least 25% CPU performance increase. 
 			mesh.MarkDynamic();
 
+			/// If the trail is a crossed stripe ... 
+			/// It is actually a doubled stripe. 
+			int coefficient = isCross ? 2 : 1;
+
 			///A TrailPoint is abstract.
 			///It contains 2 real points actually. 
-			vertices = new Vector3[2 * number];
-			normals = new Vector3[2 * number];
-			uvs = new Vector2[2 * number];
-			colors = new Color[2 * number];
-			indices = new int[6 * number];
+			vertices = new Vector3[2 * number * coefficient];
+			normals = new Vector3[2 * number * coefficient];
+			uvs = new Vector2[2 * number * coefficient];
+			colors = new Color[2 * number * coefficient];
+			indices = new int[6 * number * coefficient];
 
 			points = new RingBuffer<TrailPoint>(number);
 		}
@@ -267,7 +277,7 @@ namespace Mistral.Effects.Trail
 
 			if (isEmitting)
 			{
-				activeTrail = new TrailGraphics(GetMaxPoints());
+				activeTrail = new TrailGraphics(GetMaxPoints(), parameter.isCross);
 				activeTrail.activeSelf = true;
 				OnStartEmit();
 			}
@@ -544,7 +554,7 @@ namespace Mistral.Effects.Trail
 
 				Vector3 cross = Vector3.zero;
 
-				if (i < trail.points.Count - 1)
+				if (i < trail.activeCount - 1)
 				{
 					cross = Vector3.Cross((trail.points[i + 1].position - tp.position).normalized, cameraForward).normalized;
 				}
@@ -568,13 +578,44 @@ namespace Mistral.Effects.Trail
 				vertIdx++;
 			}
 
+			if (parameter.isCross)
+			{
+				for (int i = 0; i < trail.points.Count; i++)
+				{
+					TrailPoint tp = trail.points[i];
+					float timeFraction = tp.timeSoFar / parameter.lifeTime;
+
+					if (timeFraction > 1)
+						continue;
+
+					if (parameter.orientationType == TrailOrientation.Local)
+						cameraForward = tp.forwardDirection;
+
+					Vector3 cross = cameraForward;
+
+					Color c = parameter.colorOverLife.Evaluate(1 - (float)vertIdx / (float)trail.activeCount / 2f);
+					float s = parameter.sizeOverLife.Evaluate(timeFraction);
+
+					trail.vertices[vertIdx] = tp.position + cross * s;
+					trail.uvs[vertIdx] = new Vector2(tp.distance2Src / parameter.quadScaleFactor, 0.0f);
+					trail.normals[vertIdx] = cameraForward;
+					trail.colors[vertIdx] = c;
+					vertIdx++;
+					trail.vertices[vertIdx] = tp.position - cross * s;
+					trail.uvs[vertIdx] = new Vector2(tp.distance2Src / parameter.quadScaleFactor, 1.0f);
+					trail.normals[vertIdx] = cameraForward;
+					trail.colors[vertIdx] = c;
+					vertIdx++;
+				}
+			}
+
 			///"Stack" all redundant vertices into the termination position. 
-			Vector2 termination = trail.vertices[vertIdx - 1];
+			Vector3 termination = trail.vertices[vertIdx - 1];
 			for (int i = vertIdx; i < trail.vertices.Length; i++)
 			{
 				trail.vertices[i] = termination;
 			}
-
+			 
 			///Now let's focus on triangle array ... 
 			int triIdx = 0;
 			for (int i = 0, imax = 2 * (trail.activeCount - 1); i < imax; i++)
@@ -591,6 +632,25 @@ namespace Mistral.Effects.Trail
 					trail.indices[triIdx++] = i + 2;
 					trail.indices[triIdx++] = i + 1;
 					trail.indices[triIdx++] = i;
+				}
+			}
+
+			if (parameter.isCross)
+			{
+				for (int i = 2 * trail.activeCount, imax = 4 * trail.activeCount - 2; i < imax; i++)
+				{
+					if (i % 2 == 0)
+					{
+						trail.indices[triIdx++] = i;
+						trail.indices[triIdx++] = i + 1;
+						trail.indices[triIdx++] = i + 2;
+					}
+					else
+					{
+						trail.indices[triIdx++] = i + 2;
+						trail.indices[triIdx++] = i + 1;
+						trail.indices[triIdx++] = i;
+					}
 				}
 			}
 
@@ -659,7 +719,7 @@ namespace Mistral.Effects.Trail
 				isEmitting = Emit;
 				if (isEmitting)
 				{
-					activeTrail = new TrailGraphics(GetMaxPoints());
+					activeTrail = new TrailGraphics(GetMaxPoints(), parameter.isCross);
 					activeTrail.activeSelf = true;
 					OnStartEmit();
 				}
@@ -679,6 +739,7 @@ namespace Mistral.Effects.Trail
 
 		/// <summary>
 		/// Retrieves the Mesh of the TrailGraphics. 
+		/// For your own sake, this is READONLY! 
 		/// </summary>
 		/// <returns>The trail mesh.</returns>
 		public Mesh GetTrailMesh()

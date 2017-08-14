@@ -46,6 +46,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\Mistral Trail\External\FBX Exporter\Editor\FbxExporterWindow.cs" />
      <Compile Include="Assets\Skinner\Editor\SkinnerDebugEditor.cs" />
      <Compile Include="Assets\Skinner\Editor\SkinnerGlitchEditor.cs" />
      <Compile Include="Assets\Skinner\Editor\SkinnerGlitchTemplateEditor.cs" />
@@ -55,7 +56,6 @@
      <Compile Include="Assets\Skinner\Editor\SkinnerSourceEditor.cs" />
      <Compile Include="Assets\Skinner\Editor\SkinnerTrailEditor.cs" />
      <Compile Include="Assets\Skinner\Editor\SkinnerTrailTemplateEditor.cs" />
-     <Compile Include="Assets\UTJ\FbxExporter\Editor\FbxExporterWindow.cs" />
      <None Include="Assets\Skinner\Shader\GlitchKernels.cginc" />
      <None Include="Assets\Skinner\Shader\ParticleMotion.cginc" />
      <None Include="Assets\Skinner\Shader\Replacement.cginc" />

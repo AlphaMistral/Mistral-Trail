@@ -25,6 +25,6 @@ public class TestFBX : MonoBehaviour
 		}
 
 		mesh.vertices = verts;
-		FBXManager.SaveMeshAsFBX(mesh, "I love Lily! ");
+		FBXManager.SaveMeshAsFBX(mesh, "I love Lily!asdfsafd ");
 	}
 }

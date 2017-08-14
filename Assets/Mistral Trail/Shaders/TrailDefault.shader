@@ -87,7 +87,7 @@ Shader "Mistral/Trail/Trail Default"
 
 					#ifdef SOFTPARTICLES_ON
 
-					o.projPos = ComputeScreenPos (o.vertex);
+					o.projPos = ComputeScreenPos (o.pos);
 
 					COMPUTE_EYEDEPTH(o.projPos.z);
 
