@@ -31,21 +31,45 @@ namespace Mistral.Effects.Trail
 	}
 
 	/// <summary>
+	/// Defines how the trail is oriented regarding the indicated forward direction. 
+	/// </summary>
+	public enum TrailType
+	{
+		Vertical = 0,
+		Horizontal = 1,
+		Cross = 2
+	}
+
+	/// <summary>
 	/// This Serializable Class Serves as a Parameter Storage for Trail Rendering. 
 	/// </summary>
 	[System.Serializable]
     public class TrailParameter
     {
         public Material trailMaterial;
-        public float lifeTime;
+        public float lifeTime = 1f;
         public AnimationCurve sizeOverLife = new AnimationCurve();
+		public float sizeMultiplier = 1f;
         public Gradient colorOverLife;
 
-		public float quadScaleFactor;
-		public Transform lookAt;
+		[HideInInspector]
+		public float quadScaleFactor = 1f;
 		public TrailOrientation orientationType;
-		public bool isForwardOverrided;
-		public Vector3 forwardOverride;
+		public Vector3 forwardOverride = new Vector3(0f, 0f, 1f);
+		public TrailType trailType;
+
+		/// <summary>
+		/// Whether the Trail is a Stripe or a Crossed Pillar. 
+		/// DON'T TEMPER WITH THIS DURING RUNTIME! 
+		/// </summary>
+		[HideInInspector]
+		public bool isCross;
+
+		/// <summary>
+		/// Whether the UV of the Trail is Tiled or not. 
+		/// </summary>
+		[HideInInspector]
+		public bool isTile;
     }
 
 	/// <summary>
@@ -129,23 +153,27 @@ namespace Mistral.Effects.Trail
 
 		#region ctor
 
-		public TrailGraphics(int number)
+		public TrailGraphics(int number, bool isCross)
 		{
 			mesh = new Mesh();
 
-			///This sentence is very important!
-			///We need to change the vertex array and triangle indices very frequently.
-			///Hence for performance issues we need to make the Engine know about the situation.
-			///Post-Comment -> At Least 25% CPU performance increase. 
+			/// This sentence is very important!
+			/// We need to change the vertex array and triangle indices very frequently.
+			/// Hence for performance issues we need to make the Engine know about the situation.
+			/// Post-Comment -> At Least 25% CPU performance increase. 
 			mesh.MarkDynamic();
 
-			///A TrailPoint is abstract.
-			///It contains 2 real points actually. 
-			vertices = new Vector3[2 * number];
-			normals = new Vector3[2 * number];
-			uvs = new Vector2[2 * number];
-			colors = new Color[2 * number];
-			indices = new int[6 * number];
+			/// If the trail is a crossed stripe ... 
+			/// It is actually a doubled stripe. 
+			int coefficient = isCross ? 2 : 1;
+
+			/// A TrailPoint is abstract.
+			/// It contains 2 real points actually. 
+			vertices = new Vector3[2 * number * coefficient];
+			normals = new Vector3[2 * number * coefficient];
+			uvs = new Vector2[2 * number * coefficient];
+			colors = new Color[2 * number * coefficient];
+			indices = new int[6 * number * coefficient];
 
 			points = new RingBuffer<TrailPoint>(number);
 		}
@@ -174,6 +202,7 @@ namespace Mistral.Effects.Trail
 	/// It also simultaneously serves as the Trail Rendering Manager! 
 	/// Specifically, take the "LateUpdate" function for reference. 
 	/// </summary>
+	// [ExecuteInEditMode]
 	public abstract class TrailBase : MonoBehaviour
     {
 		#region Public Variables
@@ -186,7 +215,13 @@ namespace Mistral.Effects.Trail
 		/// <summary>
 		/// Whether the trail should be emitting or not. 
 		/// </summary>
-        public bool Emit = false;
+		public bool Emit = true;
+
+		/// <summary>
+		/// For Animation Only - The size of the trail. 
+		/// </summary>
+		[HideInInspector]
+		public float sizeForAnim = 0f;
 
 		#endregion
 
@@ -239,6 +274,7 @@ namespace Mistral.Effects.Trail
 		protected virtual void Awake()
 		{
 			totalTrailsCount++;
+			parameter.isCross = parameter.trailType == TrailType.Cross;
 			///The only Guy :) Last Titan Standing. 
 			if (totalTrailsCount == 1)
 			{
@@ -250,27 +286,14 @@ namespace Mistral.Effects.Trail
 			m_transform = transform;
 			isEmitting = Emit;
 
-			if (parameter.orientationType == TrailOrientation.LookAt && parameter.lookAt == null)
-			{
-				if (Camera.main != null)
-				{
-					parameter.lookAt = Camera.main.transform;
-					Debug.Log(gameObject.name + ": 未指定面向物体, 因此默认面向主摄像机. ");
-				}
-				else
-				{
-					parameter.orientationType = TrailOrientation.Local;
-					parameter.forwardOverride = Vector3.forward;
-					Debug.Log(gameObject.name + ": 无法指定当前Trail的朝向, 为避免错误转化为Local. ");
-				}
-			}
-
 			if (isEmitting)
 			{
-				activeTrail = new TrailGraphics(GetMaxPoints());
+				activeTrail = new TrailGraphics(GetMaxPoints(), parameter.isCross);
 				activeTrail.activeSelf = true;
 				OnStartEmit();
 			}
+
+			SetupMaterialComponent();
 		}
 
 		/// <summary>
@@ -294,8 +317,9 @@ namespace Mistral.Effects.Trail
 
 			foreach(KeyValuePair<Material, List<TrailGraphics>> pair in mat2Trail)
 			{
-				///Combine first. 
-				///We generate plenty of meshes but are actually adjacent to each other. 
+				/// Combine first. 
+				/// We generate plenty of meshes but are actually adjacent to each other. 
+				/// Although we have some Heap operations here ... It actually worths! 
 				CombineInstance[] combine = new CombineInstance[pair.Value.Count];
 				for(int i = 0;i < pair.Value.Count;i++)
 				{
@@ -320,9 +344,11 @@ namespace Mistral.Effects.Trail
 		/// </summary>
 		protected virtual void Update()
 		{
-			///If we are generating Meshes, we don't want to draw anything. 
-			///So simply destroy any mesh before generating anything. 
-			///Obviously we only want to do this once. 
+			if(!Mathf.Approximately(sizeForAnim, 0f))
+			parameter.sizeMultiplier = sizeForAnim;
+			/// If we are generating Meshes, we don't want to draw anything. 
+			/// So simply destroy any mesh before generating anything. 
+			/// Obviously we only want to do this once. 
 			if(isDrawing)
 			{
 				isDrawing = false;
@@ -355,8 +381,8 @@ namespace Mistral.Effects.Trail
 				mat2Trail[parameter.trailMaterial].Add(activeTrail);
 			}
 
-			///IMPROVEMENT: This section is extremely expensive! 
-			///Unless ABOSOLUTELY NECESSARY, do not keeping turning emit ON and OFF! 
+			/// IMPROVEMENT: This section is extremely expensive! 
+			/// Unless ABOSOLUTELY NECESSARY, do not keeping turning emit ON and OFF! 
 			for (int i = fadingTrails.Count - 1; i >= 0; i--)
 			{
 				if (fadingTrails[i] == null || fadingTrails[i].points.Any(a => a.timeSoFar < parameter.lifeTime) == false)
@@ -472,24 +498,28 @@ namespace Mistral.Effects.Trail
 			InitializeNewPoint(point);
 			point.distance2Src = activeTrail.points.Count == 0 ? 0 : activeTrail.points[activeTrail.points.Count - 1].distance2Src + 
 								 Vector3.Distance(activeTrail.points[activeTrail.points.Count - 1].position, position);
-			///Override Forward to be implemented in the future. 
 
+			point.forwardDirection = GetFacing();
+
+			activeTrail.points.Add(point);
+		}
+
+		protected Vector3 GetFacing()
+		{
 			switch (parameter.orientationType)
 			{
 				case TrailOrientation.LookAt:
-					point.forwardDirection = (parameter.lookAt.position - position).normalized;
-					break;
-				case TrailOrientation.Local:
-					point.forwardDirection = m_transform.forward;
+					return Camera.current == null ? Vector3.forward : Camera.current.transform.forward;
 					break;
 				case TrailOrientation.World:
-					point.forwardDirection = parameter.forwardOverride.normalized;
+					return parameter.forwardOverride.normalized;
 					break;
+				case TrailOrientation.Local:
+					return m_transform.TransformDirection(parameter.forwardOverride.normalized).normalized; /// Don't Ever Use This! Disaster! 
 				default:
+					return Vector3.zero;/// Actually Impossible to Happen! 
 					break;
 			}
-
-			activeTrail.points.Add(point);
 		}
 
 		#endregion
@@ -503,89 +533,126 @@ namespace Mistral.Effects.Trail
 		private void GenerateMesh(TrailGraphics trail)
 		{
 			trail.mesh.Clear(false);
-			Vector3 cameraForward = Camera.main.transform.forward;
-
-			///Determine the trail forward direction.
-			switch (parameter.orientationType)
-			{
-				case TrailOrientation.LookAt:
-					cameraForward = (parameter.lookAt.position - m_transform.position).normalized;
-					break;
-
-				case TrailOrientation.Local:
-					cameraForward = m_transform.forward;
-					break;
-				case TrailOrientation.World:
-					cameraForward = parameter.forwardOverride.normalized;
-					break;
-
-				default:
-					break;
-			}
-
+			Vector3 cameraForward = GetFacing();
 			trail.activeCount = ActivePointsNumber(trail);
 
-			///No way to draw a Mesh with only 2 vertices or even less. Exit.
+			/// No way to draw a Mesh with only 2 vertices or even less. Exit.
 			if (trail.activeCount < 2)
 				return;
 
 			int vertIdx = 0;
-			for (int i = 0; i < trail.points.Count; i++)
+			Vector3 lastCross = cameraForward;
+			if (parameter.trailType == TrailType.Vertical || parameter.isCross)
 			{
-				TrailPoint tp = trail.points[i];
-				float timeFraction = tp.timeSoFar / parameter.lifeTime;
-
-				if (timeFraction > 1)
-					continue;
-
-				if (parameter.orientationType == TrailOrientation.Local)
-					cameraForward = tp.forwardDirection;
-
-				Vector3 cross = Vector3.zero;
-
-				if (i < trail.points.Count - 1)
+				for (int i = 0; i < trail.points.Count; i++)
 				{
-					cross = Vector3.Cross((trail.points[i + 1].position - tp.position).normalized, cameraForward).normalized;
-				}
-				else
-				{
-					cross = Vector3.Cross((tp.position - trail.points[i - 1].position).normalized, cameraForward).normalized;
-				}
+					TrailPoint tp = trail.points[i];
+					float timeFraction = tp.timeSoFar / parameter.lifeTime;
 
-				Color c = parameter.colorOverLife.Evaluate(1 - (float)vertIdx / (float)trail.activeCount / 2f);
-				float s = parameter.sizeOverLife.Evaluate(timeFraction);
+					if (timeFraction > 1)
+						continue;
 
-				trail.vertices[vertIdx] = tp.position + cross * s;
-				trail.uvs[vertIdx] = new Vector2(tp.distance2Src / parameter.quadScaleFactor, 0.0f);
-				trail.normals[vertIdx] = cameraForward;
-				trail.colors[vertIdx] = c;
-				vertIdx++;
-				trail.vertices[vertIdx] = tp.position - cross * s;
-				trail.uvs[vertIdx] = new Vector2(tp.distance2Src / parameter.quadScaleFactor, 1.0f);
-				trail.normals[vertIdx] = cameraForward;
-				trail.colors[vertIdx] = c;
-				vertIdx++;
+					if (parameter.orientationType == TrailOrientation.Local)
+						cameraForward = tp.forwardDirection;
+
+					Vector3 cross = Vector3.zero;
+					Vector3 moveDir = cameraForward;
+
+					if(i < trail.points.Count - 1)
+						moveDir = (trail.points[i + 1].position - tp.position).normalized;
+					else 
+						moveDir = (tp.position - trail.points[i - 1].position).normalized;
+					cross = Vector3.Cross(moveDir, cameraForward).normalized;
+
+					if (cross.magnitude < 0.9f) 
+					{
+						cross = lastCross.normalized;
+					}
+
+					else if (Vector3.Dot(cross, lastCross) < 0f)
+					{
+						cross = -cross;
+						lastCross = -cross;
+					}
+
+					else
+					{
+						lastCross = cross;
+					}
+
+					Color c = parameter.colorOverLife.Evaluate(1 - (float)vertIdx / (float)trail.activeCount / 2f);
+					float s = parameter.sizeOverLife.Evaluate(timeFraction);
+
+					float uvx = parameter.isTile ? tp.distance2Src / parameter.quadScaleFactor : 1 - timeFraction;
+					Vector3 offset = cross * s * parameter.sizeMultiplier;
+					trail.vertices[vertIdx] = tp.position + offset;
+					trail.uvs[vertIdx] = new Vector2(uvx, 0.0f);
+					trail.normals[vertIdx] = cameraForward;
+					trail.colors[vertIdx] = c;
+					vertIdx++;
+					trail.vertices[vertIdx] = tp.position - offset;
+					trail.uvs[vertIdx] = new Vector2(uvx, 1.0f);
+					trail.normals[vertIdx] = cameraForward;
+					trail.colors[vertIdx] = c;
+					vertIdx++;
+				}
 			}
 
-			///"Stack" all redundant vertices into the termination position. 
-			Vector2 termination = trail.vertices[vertIdx - 1];
+			int oldVertIdx = vertIdx;
+			lastCross = cameraForward;
+
+			if (parameter.trailType == TrailType.Horizontal || parameter.isCross)
+			{
+				for (int i = 0; i < trail.points.Count; i++)
+				{
+					TrailPoint tp = trail.points[i];
+					float timeFraction = tp.timeSoFar / parameter.lifeTime;
+
+					if (timeFraction > 1)
+						continue;
+
+					if (parameter.orientationType == TrailOrientation.Local)
+						cameraForward = tp.forwardDirection;
+
+					Vector3 cross = cameraForward;
+
+					Color c = parameter.colorOverLife.Evaluate(1 - ((float)vertIdx - oldVertIdx) / (float)trail.activeCount / 2f);
+					float s = parameter.sizeOverLife.Evaluate(timeFraction);
+
+					float uvx = parameter.isTile ? tp.distance2Src / parameter.quadScaleFactor : 1 - timeFraction;
+					Vector3 offset = cross * s * parameter.sizeMultiplier;
+					trail.vertices[vertIdx] = tp.position + offset;
+					trail.uvs[vertIdx] = new Vector2(uvx, 0.0f);
+					trail.normals[vertIdx] = cameraForward;
+					trail.colors[vertIdx] = c;
+					vertIdx++;
+					trail.vertices[vertIdx] = tp.position - offset;
+					trail.uvs[vertIdx] = new Vector2(uvx, 1.0f);
+					trail.normals[vertIdx] = cameraForward;
+					trail.colors[vertIdx] = c;
+					vertIdx++;
+				}
+			}
+
+			/// "Stack" all redundant vertices into the termination position. 
+			Vector3 termination = trail.vertices[vertIdx - 1];
 			for (int i = vertIdx; i < trail.vertices.Length; i++)
 			{
 				trail.vertices[i] = termination;
 			}
-
-			///Now let's focus on triangle array ... 
+			 
+			/// Now let's focus on triangle array ... 
 			int triIdx = 0;
 			for (int i = 0, imax = 2 * (trail.activeCount - 1); i < imax; i++)
 			{
-				///Ok, start point. 
+				/// Ok, start point. 
 				if (i % 2 == 0)
 				{
 					trail.indices[triIdx++] = i;
 					trail.indices[triIdx++] = i + 1;
 					trail.indices[triIdx++] = i + 2;
 				}
-				else///Reverse the process. 
+				else/// Reverse the process. 
 				{
 					trail.indices[triIdx++] = i + 2;
 					trail.indices[triIdx++] = i + 1;
@@ -593,16 +660,35 @@ namespace Mistral.Effects.Trail
 				}
 			}
 
-			///"Squash" all the redundant vertices and triangle arrays. 
+			if (parameter.isCross)
+			{
+				for (int i = 2 * trail.activeCount, imax = 4 * trail.activeCount - 2; i < imax; i++)
+				{
+					if (i % 2 == 0)
+					{
+						trail.indices[triIdx++] = i;
+						trail.indices[triIdx++] = i + 1;
+						trail.indices[triIdx++] = i + 2;
+					}
+					else
+					{
+						trail.indices[triIdx++] = i + 2;
+						trail.indices[triIdx++] = i + 1;
+						trail.indices[triIdx++] = i;
+					}
+				}
+			}
+
+			/// "Squash" all the redundant vertices and triangle arrays. 
 			int termIdx = trail.indices[triIdx - 1];
 			for (int i = triIdx; i < trail.indices.Length; i++)
 			{
 				trail.indices[i] = termIdx;
 			}
 
-			///So now comes the Exciting part. CONG! 
+			/// So now comes the Exciting part. CONG! 
 			trail.mesh.vertices = trail.vertices;
-			///Setting Indices array directly to mesh also works. 
+			/// Setting Indices array directly to mesh also works. 
 			trail.mesh.SetIndices(trail.indices, MeshTopology.Triangles, 0);
 			trail.mesh.uv = trail.uvs;
 			trail.mesh.normals = trail.normals;
@@ -658,18 +744,47 @@ namespace Mistral.Effects.Trail
 				isEmitting = Emit;
 				if (isEmitting)
 				{
-					activeTrail = new TrailGraphics(GetMaxPoints());
+					activeTrail = new TrailGraphics(GetMaxPoints(), parameter.isCross);
 					activeTrail.activeSelf = true;
 					OnStartEmit();
 				}
 				else
 				{
+					if(activeTrail == null)
+						return;
 					OnStopEmit();
 					activeTrail.activeSelf = false;
 					fadingTrails.Add(activeTrail);
 					activeTrail = null;
 				}
 			}
+		}
+
+		/// <summary>
+		/// Setups the material component.
+		/// </summary>
+		private void SetupMaterialComponent ()
+		{
+			MeshRenderer thisRenderer = GetComponent<MeshRenderer>();
+			if (thisRenderer == null)
+			{
+				thisRenderer = gameObject.AddComponent<MeshRenderer>();
+			}
+			thisRenderer.material = parameter.trailMaterial;
+		}
+
+		#endregion
+
+		#region Public Methods
+
+		/// <summary>
+		/// Retrieves the Mesh of the TrailGraphics. 
+		/// For your own sake, this is READONLY! 
+		/// </summary>
+		/// <returns>The trail mesh.</returns>
+		public Mesh GetTrailMesh()
+		{
+			return activeTrail.mesh;
 		}
 
 		#endregion

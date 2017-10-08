@@ -5,3 +5,7 @@ Temp/
 Assets/PigeonCoopToolkit/
 *.csproj
 *.userprefs
+*.dll
+*.dll.mdb
+obj/
+Assets/MTR Generated/

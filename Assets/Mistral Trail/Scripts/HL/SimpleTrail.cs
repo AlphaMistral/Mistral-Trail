@@ -74,7 +74,6 @@ namespace Mistral.Effects.Trail
 			return maxPointNumber;
 		}
 
-
 		#endregion
 
 	}

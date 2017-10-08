@@ -3,6 +3,8 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mistral Trail", "Assembly-CSharp.csproj", "{414B9034-BCF2-1615-0BB7-8662542A810B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mistral Trail", "Assembly-CSharp-Editor.csproj", "{0F2B65F3-24BA-BDCD-51BB-21E68DD84417}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -13,11 +15,51 @@ Global
 		{414B9034-BCF2-1615-0BB7-8662542A810B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{414B9034-BCF2-1615-0BB7-8662542A810B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{414B9034-BCF2-1615-0BB7-8662542A810B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0F2B65F3-24BA-BDCD-51BB-21E68DD84417}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0F2B65F3-24BA-BDCD-51BB-21E68DD84417}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0F2B65F3-24BA-BDCD-51BB-21E68DD84417}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0F2B65F3-24BA-BDCD-51BB-21E68DD84417}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
-		StartupItem = Assembly-CSharp.csproj
+		Policies = $0
+		$0.DotNetNamingPolicy = $1
+		$1.DirectoryNamespaceAssociation = None
+		$1.ResourceNamePolicy = FileFormatDefault
+		$0.TextStylePolicy = $2
+		$2.TabsToSpaces = False
+		$2.inheritsSet = VisualStudio
+		$2.inheritsScope = text/plain
+		$2.scope = text/x-csharp
+		$0.CSharpFormattingPolicy = $3
+		$3.IndentSwitchBody = True
+		$3.IndentBlocksInsideExpressions = True
+		$3.AnonymousMethodBraceStyle = NextLine
+		$3.PropertyBraceStyle = NextLine
+		$3.PropertyGetBraceStyle = NextLine
+		$3.PropertySetBraceStyle = NextLine
+		$3.EventBraceStyle = NextLine
+		$3.EventAddBraceStyle = NextLine
+		$3.EventRemoveBraceStyle = NextLine
+		$3.StatementBraceStyle = NextLine
+		$3.ElseNewLinePlacement = NewLine
+		$3.CatchNewLinePlacement = NewLine
+		$3.FinallyNewLinePlacement = NewLine
+		$3.WhileNewLinePlacement = DoNotCare
+		$3.ArrayInitializerWrapping = DoNotChange
+		$3.ArrayInitializerBraceStyle = NextLine
+		$3.BeforeMethodDeclarationParentheses = False
+		$3.BeforeMethodCallParentheses = False
+		$3.BeforeConstructorDeclarationParentheses = False
+		$3.NewLineBeforeConstructorInitializerColon = NewLine
+		$3.NewLineAfterConstructorInitializerColon = SameLine
+		$3.BeforeDelegateDeclarationParentheses = False
+		$3.NewParentheses = False
+		$3.SpacesBeforeBrackets = False
+		$3.inheritsSet = Mono
+		$3.inheritsScope = text/x-csharp
+		$3.scope = text/x-csharp
 	EndGlobalSection
 EndGlobal

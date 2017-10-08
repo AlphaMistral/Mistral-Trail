@@ -30,6 +30,8 @@ namespace Mistral.Effects.Trail
 		{
 			public Vector3 position;
 			public Vector3 forward;
+			public Vector3 velocity = Vector3.zero;
+			public float distance2Src = 0f;
 		}
 
 		#endregion
@@ -42,12 +44,12 @@ namespace Mistral.Effects.Trail
 		/// Please note that since additional control points are automatically added during runtime. 
 		/// It is unnecessary to assign a large point number. 
 		/// </summary>
-		public int maxPointNumber = 15;
+		public int maxPointNumber = 150;
 
 		/// <summary>
 		/// Number of points to be inserted between two control points. 
 		/// </summary>
-		public int pointsInMiddle;
+		public int pointsInMiddle = 4;
 
 		#endregion
 
@@ -80,20 +82,7 @@ namespace Mistral.Effects.Trail
 				else
 				{
 					controlPoints[controlPoints.Count - 1].position = m_transform.position;
-					switch (parameter.orientationType)
-					{
-						case TrailOrientation.LookAt:
-							controlPoints[controlPoints.Count - 1].forward = (parameter.lookAt.position - m_transform.position).normalized;
-							break;
-						case TrailOrientation.Local:
-							controlPoints[controlPoints.Count - 1].forward = transform.forward;
-							break;
-						case TrailOrientation.World:
-							controlPoints[controlPoints.Count - 1].forward = parameter.forwardOverride;
-							break;
-						default:
-							break;
-					}
+					controlPoints[controlPoints.Count - 1].forward = GetFacing();
 				}
 				lastPosition = m_transform.position;
 			}
@@ -112,20 +101,7 @@ namespace Mistral.Effects.Trail
 			controlPoints = new RingBuffer<AdditionalPoint>(maxPointNumber);
 			controlPoints.Add(new AdditionalPoint { position = lastPosition });
 
-			switch (parameter.orientationType)
-			{
-				case TrailOrientation.LookAt:
-					controlPoints[0].forward = (parameter.lookAt.position - controlPoints[0].position).normalized;
-					break;
-				case TrailOrientation.Local:
-					controlPoints[0].forward = transform.forward;
-					break;
-				case TrailOrientation.World:
-					controlPoints[0].forward = parameter.forwardOverride;
-					break;
-				default:
-					break;
-			}
+			controlPoints[0].forward = GetFacing();
 
 			AddPoint(new TrailPoint(), lastPosition);
 			AddControlPoint(lastPosition);
@@ -146,6 +122,7 @@ namespace Mistral.Effects.Trail
 			{
 				trail.points[trailPointIdx].position = controlPoints[i].position;
 
+				if(parameter.orientationType != TrailOrientation.World)
 				trail.points[trailPointIdx].forwardDirection = controlPoints[i].forward;
 
 				trailPointIdx++;
@@ -178,16 +155,38 @@ namespace Mistral.Effects.Trail
 
 					for (int j = 0; j < pointsInMiddle; j++)
 					{
-						float t = ( ( (float)j + 1 ) / ( (float)pointsInMiddle + 1 ) );
-						trail.points[trailPointIdx].position = Bezier.CalculateCubic(t, controlPoints[i].position, cp1, cp2, controlPoints[i + 1].position);
+						float t = (((float)j + 1) / ((float)pointsInMiddle + 1));
+						trail.points[trailPointIdx].position = Bezier.CalculateCubic(t, controlPoints[i].position, cp1, cp2, controlPoints[i + 1].position, 0.3f);
 						trail.points[trailPointIdx].timeSoFar = Mathf.Lerp(current.timeSoFar, next.timeSoFar, t);
 
-						trail.points[trailPointIdx].forwardDirection = Vector3.Lerp(current.forwardDirection, next.forwardDirection, t);
+						if (parameter.orientationType != TrailOrientation.World)
+							trail.points[trailPointIdx].forwardDirection = Vector3.Lerp(current.forwardDirection, next.forwardDirection, t);
 
 						trailPointIdx++;
 					}
 				}
+				else
+				{
+					for (int j = 0; j < pointsInMiddle; j++)
+					{
+						if (trail.points[trailPointIdx - pointsInMiddle].position == null || trail.points[trailPointIdx] == null)
+							continue;
+						float t = (((float)j + 1) / ((float)pointsInMiddle + 1));
+						trail.points[trailPointIdx].position = controlPoints[controlPoints.Count - 1].position;
+						trail.points[trailPointIdx].timeSoFar = trail.points[trailPointIdx - pointsInMiddle].timeSoFar;
+
+						if (parameter.orientationType != TrailOrientation.World)
+							trail.points[trailPointIdx].forwardDirection = trail.points[trailPointIdx - pointsInMiddle].forwardDirection;
+
+						trailPointIdx++;
+					}
+				}
+				if (i == 0)
+					controlPoints[i].distance2Src = 0f;
+				else controlPoints[i].distance2Src = controlPoints[i - 1].distance2Src + Vector3.Distance(controlPoints[i].position, controlPoints[i - 1].position);
 			}
+
+            CustomChanges(controlPoints, deltaTime);
 
 			int lastCPIdx = (pointsInMiddle + 1) * (controlPoints.Count - 1);
 			int prevCPIdx = lastCPIdx - pointsInMiddle - 1;
@@ -199,6 +198,7 @@ namespace Mistral.Effects.Trail
 				distance2Src += Vector3.Distance(trail.points[i - 1].position, trail.points[i].position);
 				trail.points[i].distance2Src = distance2Src;
 			}
+
 		}
 
 		#endregion
@@ -214,25 +214,20 @@ namespace Mistral.Effects.Trail
 			AddPoint(new TrailPoint(), pos);
 			AdditionalPoint ap = new AdditionalPoint { position = pos };
 
-			switch (parameter.orientationType)
-			{
-				case TrailOrientation.World:
-					ap.forward = parameter.forwardOverride;
-					break;
-				case TrailOrientation.Local:
-					ap.forward = m_transform.forward;
-					break;
-				case TrailOrientation.LookAt:
-					ap.forward = (parameter.lookAt.position - m_transform.position).normalized;
-					break;
-				default:
-					break;
-			}
+			ap.forward = GetFacing();
 
 			controlPoints.Add(ap);
-
 		}
 
-		#endregion
-	}
+        #endregion
+
+        #region Override
+
+        protected virtual void CustomChanges(RingBuffer<AdditionalPoint> cps, float deltatime)
+        {
+
+        }
+
+        #endregion
+    }
 }
