@@ -125,7 +125,7 @@ namespace Mistral.Utility.MathX
 				{
 					///HYPOTHESIS: Should use (j + 1) / precision instead. 
 					float t = (float)j / (float)(precision - 1);
-					results.Add(Bezier.CalculateCubic(t, sPoints[i], triSectionControlPoints[i * 2], triSectionControlPoints[i * 2 + 1], sPoints[i + 1]));
+					results.Add(Bezier.CalculateCubic(t, sPoints[i], triSectionControlPoints[i * 2], triSectionControlPoints[i * 2 + 1], sPoints[i + 1], 0.3f));
 				}
 			}
 		}

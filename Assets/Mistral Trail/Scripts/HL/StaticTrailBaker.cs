@@ -94,8 +94,6 @@ namespace Mistral.Effects.Trail
 				toBake.SetIndices(original.GetIndices(0), MeshTopology.Triangles, 0);
 				FBXManager.SaveMeshAsFBX(toBake, trailName);
 			}
-			else
-				Debug.Log("Go Fuck yourself! Nothing to bake at all! ");
 		}
 
 		#endregion
